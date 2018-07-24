@@ -68,9 +68,10 @@ class Character : public Component
 
 public:
   std::wstring ClassName;
-  Character(int _s = 1, int _i = 1, int _a = 1, int _st = 1, std::shared_ptr<Class> _ct = std::make_shared<Class>()) : Strength(_s), Intelligence(_i), Agility(_a), Stamina(_st), ClassType(&_ct), ClassName(_ct->GetName()){};
+  Character(int _s = 1, int _i = 1, int _a = 1, int _st = 1, std::shared_ptr<Class> _ct = std::make_shared<Class>()) 
+  : Strength(_s), Intelligence(_i), Agility(_a), Stamina(_st), ClassType(&_ct), ClassName(_ct->GetName()), Inventory({}){};
 
-  Item GetInventoryAt(int i) { return *Inventory[i]; }
+  Item* GetInventoryAt(int i) { if(Inventory.size() == 0 || Inventory.empty()){ return nullptr; } else { return Inventory[i];} }
   std::vector<Item*> GetInventory() { return Inventory; }
   void AddToInventory(Item& i)
   {

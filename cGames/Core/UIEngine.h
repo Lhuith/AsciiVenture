@@ -50,7 +50,7 @@ class UIEngine {
         //-------------------------------UI ELEMENTS-------------------------------------/////
         std::vector<Canvas*> GetCanvasList(){return CanvasList;}
         Canvas* GetCanvasAt(int i){return CanvasList.at(0);}
-        wchar_t RenderSlot(cSprite, int x, int y, bool flipC = false);
+        wchar_t RenderIcon(cSprite, int x, int y, bool flipC = false);
         void RenderCanvasElements();
         void RenderCanvas(Canvas c); //Render Canvas
         void RenderPanel(PanelComponent p, Vector2 pos); //Render Panels inside Canvas

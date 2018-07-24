@@ -24,7 +24,7 @@ class PanelComponent : public Component {
     cUISprite UISprite;
 
     public:
-        explicit PanelComponent(Vector2 s = Vector2(1,1), WORD c = 0x000F | 0x0000, cUISprite ui =  cUISprite(Models::UI::pants_00, Vector2(3,3), Vector2 (3, 2), 0x000F)):
+        explicit PanelComponent(Vector2 s = Vector2(1,1), WORD c = 0x000F | 0x0000, cUISprite ui =  cUISprite(L"?", Vector2(3,3), Vector2 (3, 2), 0x000F)):
             size(s), color(c), UISprite(ui){}
 
         Vector2 GetSize()const{return size;}

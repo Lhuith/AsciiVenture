@@ -100,6 +100,7 @@ int main()
                         {std::make_shared<cSprite>(Models::Entities::humanoid_00),
                          std::make_shared<Character>(1, 1, 1, 1, std::make_shared<Warrior>()),
                          std::make_shared<BoxCollider>(Vector2(3, 3))});
+
     currentLevel->AddObject(Player);
 
     float screenWH = Engine->GetRenderer()->GetScreenWidth() / 2.0;
@@ -113,9 +114,14 @@ int main()
 
     PlayerInformation = *Player->GetComponent<Character>();
 
+    Chest* c = new Chest(Gear::GEARTYPE::PLATE, 52, 1,
+     new cUISprite(Models::UI::chest_00, Vector2(5, 3), Vector2(3, 2), 0x000F), 
+     new cSprite(Models::Items::chest_00, Vector2(3, 2), Vector2(1, 1), 0x000F));
+
+    PlayerInformation.AddToInventory(*c);
+
     //Player->AddChild(testLight);
     //testLight->AddChild(testLight2);
-
     currentLevel->AddObject(testLight2);
     testLight2->AddChild(testLight);
 
@@ -123,8 +129,9 @@ int main()
     Engine->Init();
 
     //Engine->GetPhysics()->SetObjectCollisionRefrence();
+    InitInventory();
     InitMenu();
-    
+
     while (1)
     {
 
@@ -168,18 +175,21 @@ int main()
             }
 
             Menu->SetActive(false);
+            Inventory->SetActive(false);
         }
-        else if (CurrentState == INVENTORY)
+
+        if (CurrentState == INVENTORY)
         {
             Engine->SetRenderWorldBool(false);
-            //Engine->GetUI()->SetShowMenu(true);
             Menu->SetActive(false);
+            Inventory->SetActive(true);
         }
-        else if (CurrentState == PAUSED)
+        
+        if (CurrentState == PAUSED)
         {
             Engine->SetRenderWorldBool(false);
-            //Engine->GetUI()->SetShowPause(true);
             Menu->SetActive(true);
+            Inventory->SetActive(false);
         }
     }
 

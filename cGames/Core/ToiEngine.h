@@ -80,7 +80,7 @@ class ToiEngine
         UI->Update();
         Physics->Update();
         UI->GetDebugWindow()->HightLight(Engine->m_mouseScroll, Engine->old_mouseScroll, Engine->m_mousePosX, Engine->m_mousePosY);
-        UI->Debug(Physics->GetEngine()->GetCamera()->GetName());
+        //UI->Debug(Physics->GetEngine()->GetCamera()->GetName());
         Renderer->PrintGameInformation();
         Renderer->BlitToScreen();
     }
