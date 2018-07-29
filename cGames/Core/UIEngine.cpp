@@ -1,12 +1,3 @@
-//void UIEngine::RenderText(Vector2 pos, std::wstring text, WORD col)
-//{
-//    for (int i = 0; i < text.size() + 1; i++)
-//    {
-//        Renderer->SetScreenAt(((int)pos.y) * Renderer->GetScreenWidth() + ((int)pos.x + i), text[i]);
-//        Renderer->SetScreenAttributeAt(((int)pos.y) * Renderer->GetScreenWidth() + ((int)pos.x + i), col);
-//    }
-//}
-
 wchar_t UIEngine::RenderIcon(cSprite c, int x, int y, bool flipC)
 {
     wchar_t wc;
@@ -26,12 +17,6 @@ wchar_t UIEngine::RenderIcon(cSprite c, int x, int y, bool flipC)
     return wc;
 }
 
-void UIEngine::Inventory()
-{
-}
-void UIEngine::Menu()
-{
-}
 
 void UIEngine::RenderPanel(PanelComponent p, Vector2 pos)
 {
@@ -50,16 +35,8 @@ void UIEngine::RenderPanel(PanelComponent p, Vector2 pos)
             }
             else
             {
-                
-                if(p.GetUISprite().GetM() != L"?")
-                    att.Char.UnicodeChar = RenderIcon(p.GetUISprite(), x, y);
-                else
-                    att.Char.UnicodeChar = ' ';
-
-                if (att.Char.UnicodeChar != ' ')
-                    att.Attributes = p.GetColor();
-                else
-                    att.Attributes = 0x00F0;
+                att.Char.UnicodeChar = ' ';
+                att.Attributes = p.GetColor();
             }
 
             Renderer->SetScreenCharAt(mIndex, att);
@@ -67,32 +44,7 @@ void UIEngine::RenderPanel(PanelComponent p, Vector2 pos)
     }
 }
 
-void UIEngine::RenderCanvas(Canvas c)
-{
-    //RenderBackground
-    if (c.GetComponent<CanvasComponent>() != nullptr)
-        RenderCanvasBackGround(*c.GetComponent<CanvasComponent>(), c.t.GetPos());
-
-    if (c.GetChildren().size() != 0)
-    {
-        for (int i = 0; i < c.GetChildren().size(); i++)
-        {
-            //Render Panels
-            if (c.GetChildAt(i)->GetComponent<PanelComponent>() != nullptr)
-            {
-                RenderPanel(*c.GetChildAt(i)->GetComponent<PanelComponent>(), c.GetChildAt(i)->t.GetPos());
-            }
-
-            //Render Text
-            if (c.GetChildAt(i)->GetComponent<TextComponent>() != nullptr)
-            {
-                RenderText(*c.GetChildAt(i)->GetComponent<TextComponent>(), c.GetChildAt(i)->t.GetPos());
-            }
-        }
-    }
-}
-
-void UIEngine::RenderCanvasBackGround(CanvasComponent c, Vector2 pos)
+void UIEngine::RenderBackGround(PanelComponent c, Vector2 pos)
 {
     for (int nx = 0; nx < c.GetSize().x; nx++)
         for (int ny = 0; ny < c.GetSize().y; ny++)
@@ -105,55 +57,64 @@ void UIEngine::RenderCanvasBackGround(CanvasComponent c, Vector2 pos)
         }
 }
 
-void UIEngine::RenderText(TextComponent t, Vector2 pos)
-{
-    for (int i = 0; i < t.GetText().size() + 1; i++)
-    {
-        Renderer->SetScreenAt(((int)pos.y) * Renderer->GetScreenWidth() + (((int)pos.x - t.GetText().size()/2.0) + i), t.GetText()[i]);
-        Renderer->SetScreenAttributeAt(((int)pos.y) * Renderer->GetScreenWidth() + (((int)pos.x - t.GetText().size()/2.0) + i), t.GetColor());
-    }
-}
 
-void UIEngine::RenderCanvasElements()
+void UIEngine::RenderUIElements()
 {
-    if (CanvasList.size() != 0)
+    if (UIElements.size() != 0)
     {
-        for (int i = 0; i < CanvasList.size(); i++)
+        for (int i = 0; i < UIElements.size(); i++)
         {
-            if (CanvasList.at(i)->isActive)
+            if (UIElements.at(i)->isActive)
             {
-                RenderCanvas(*CanvasList.at(i));
+                //RenderCanvas(*UIElements.at(i));
+                if(UIElements.at(i)->GetComponent<PanelComponent>() != nullptr){
+                   UIElements.at(i)->GetComponent<PanelComponent>()->RenderBackGround(Renderer); 
+                   UIElements.at(i)->GetComponent<PanelComponent>()->RenderPanel(Renderer, m_mousePosX, m_mousePosY); 
+                }
             }
         }
     }
 }
 
-void UIEngine::SetCanvas()
+bool UIEngine::HoverOver(Vector2 pos, Vector2 size){
+        Vector2 p0 = Vector2((float)(pos.x), (float)(pos.y));
+        Vector2 p1 = Vector2((float)(pos.x + (float)size.x), (float)(pos.y + size.y));
+
+        if(pointInRect(m_mousePosX, m_mousePosY, p0, p1))
+           return true;
+
+        return false;
+}
+
+void UIEngine::SetUIElement()
 {
-    if (CanvasList.size() != 0)
+    if (UIElements.size() != 0)
     {
-        for (int i = 0; i < CanvasList.size(); i++)
+        for (int i = 0; i < UIElements.size(); i++)
         {
-            if (CanvasList.at(i)->isActive)
-            {
-                CanvasList.at(i)->t.SetWorldTransform(new Vector2(0,0));
-		        //CanvasList.at(i)->SetLocalArray(*CanvasList);
-                CanvasList.at(i)->Init();
-            }
+            UIElements.at(i)->t.SetWorldTransform(&UIElements.at(i)->t.GetPositionRefrence());
+            UIElements.at(i)->SetLocalArray(UIElements);
+            UIElements.at(i)->Init();
         }
     }
 }
 
-
-void UIEngine::UpdateCanvas()
+void UIEngine::SetUIElement(Object *c)
 {
-    if (CanvasList.size() != 0)
+    c->t.SetWorldTransform(&c->t.GetPositionRefrence());
+    c->SetLocalArray(UIElements);
+    c->Init();
+}
+
+void UIEngine::UpdateUIElemnts()
+{
+    if (UIElements.size() != 0)
     {
-        for (int i = 0; i < CanvasList.size(); i++)
+        for (int i = 0; i < UIElements.size(); i++)
         {
-            if (CanvasList.at(i)->isActive)
+            if (UIElements.at(i)->isActive)
             {
-                CanvasList.at(i)->Update();
+                UIElements.at(i)->Update();
             }
         }
     }

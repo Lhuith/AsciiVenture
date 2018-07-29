@@ -51,11 +51,12 @@ protected:
 class Character : public Component
 {
   int Health = 100;
+  int Armour = 100;
   int Mana = 100;
   int Energy = 100;
 
   int Strength;
-  int Intelligence;
+  int Intellect;
   int Agility;
   int Stamina;
   int InventoryMax = 10;
@@ -69,9 +70,10 @@ class Character : public Component
 public:
   std::wstring ClassName;
   Character(int _s = 1, int _i = 1, int _a = 1, int _st = 1, std::shared_ptr<Class> _ct = std::make_shared<Class>()) 
-  : Strength(_s), Intelligence(_i), Agility(_a), Stamina(_st), ClassType(&_ct), ClassName(_ct->GetName()), Inventory({}){};
+  : Strength(_s), Intellect(_i), Agility(_a), Stamina(_st), ClassType(&_ct), ClassName(_ct->GetName()), Inventory(){};
 
-  Item* GetInventoryAt(int i) { if(Inventory.size() == 0 || Inventory.empty()){ return nullptr; } else { return Inventory[i];} }
+  Item* GetInventoryAt(int i) { return Inventory[i];}
+
   std::vector<Item*> GetInventory() { return Inventory; }
   void AddToInventory(Item& i)
   {
@@ -115,6 +117,16 @@ public:
       }
     }
   }
+
+
+int GetHealth(){return Health;}
+int GetMana(){return Mana;}
+int GetEnergy(){return Energy;}
+int GetStrength(){return Strength;}
+int GetIntellect(){return Intellect;}
+int GetAgility(){return Agility;}
+int GetStamina(){return Stamina;}
+int GetArmour(){return Armour;}
 
 private:
 protected:

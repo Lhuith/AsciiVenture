@@ -14,19 +14,12 @@
 //#include "Primitives/Humonoid.h"
 #include "../AsciiArt.h"
 
-#include "cUISprite.h"
 
-#include "../Item.h"
 
-#include "Collider.h"
-#include "BoxCollider.h"
-#include "CircleCollider.h"
-
-#include "../Character.h"
 #include "Light.h"
 #include "Scene.h"
 
-#include "../OverWorld.h"
+
 //#include "Primitives/TestHouse.h"
 
 #include "CoreEngine.h"
@@ -35,8 +28,15 @@
 #include "UIElements.h"
 
 #include "UIEngine.h"
+#include "../Item.h"
 
+#include "Collider.h"
+#include "BoxCollider.h"
+#include "CircleCollider.h"
+#include "../Character.h"
 #include "PhysicsEngine.h"
+
+#include "../OverWorld.h"
 
 class ToiEngine
 {

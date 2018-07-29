@@ -9,7 +9,7 @@ class UIEngine {
     float m_mousePosY;
 
     bool ShowInventory, ShowPause;
-    std::vector<Canvas*> CanvasList;
+    std::vector<Object*> UIElements;
 
     public:
         explicit UIEngine(TextBox* db = new TextBox(), TextBox* gtb = new TextBox(), RenderEngine *r = new RenderEngine()) :
@@ -24,16 +24,14 @@ class UIEngine {
         void SetShowMenu(bool b){ShowInventory = b; if(b == true)ShowPause = false;}
         void SetShowPause(bool b){ShowPause = b; if(b == true)ShowInventory = false;}
         bool GetShowMenuBool(){return ShowInventory;}
-        
+        bool HoverOver(Vector2 pos, Vector2 size);
+
         //---------------------------------UPDATE---------------------------------///////
         void Update(){
-            if(!ShowInventory && !ShowPause) RenderTextBoxes(); 
-            if(ShowInventory)Inventory(); 
-            if(ShowPause)Menu(); 
+            RenderTextBoxes(); 
             UpdateUIInput();
-            RenderCanvasElements();
-            //UpdateCanvas();
-            //UpdateUIComponents();
+            RenderUIElements();
+            UpdateUIElemnts();
             }
         //---------------------------------UPDATE---------------------------------///////
 
@@ -48,30 +46,25 @@ class UIEngine {
         void Debug(Vector2 v){DebugTextBox->Log(s2ws(std::to_string((int)round(v.x)) + " " + std::to_string((int)round(v.y))));}
         
         //-------------------------------UI ELEMENTS-------------------------------------/////
-        std::vector<Canvas*> GetCanvasList(){return CanvasList;}
-        Canvas* GetCanvasAt(int i){return CanvasList.at(0);}
+        std::vector<Object*> GetUIElements(){return UIElements;}
+        Object* GetCanvasAt(int i){return UIElements.at(0);}
         wchar_t RenderIcon(cSprite, int x, int y, bool flipC = false);
-        void RenderCanvasElements();
-        void RenderCanvas(Canvas c); //Render Canvas
         void RenderPanel(PanelComponent p, Vector2 pos); //Render Panels inside Canvas
-        void RenderText(TextComponent t, Vector2 pos);
-        void RenderCanvasBackGround(CanvasComponent c, Vector2 pos);
-        void AddCanvas(Canvas* c){CanvasList.push_back(c);}
-
-        void UpdateCanvas();
-        void SetCanvas();
+        void RenderText(TextComponent t, Vector2 pos, Vector2 *PanelSize = nullptr);
+        void RenderBackGround(PanelComponent c, Vector2 pos);
+        void AddUIElement(Object* c){UIElements.push_back(c); SetUIElement(c);}
+        void RenderUIElements();
+        void UpdateUIElemnts();
+        void SetUIElement();
+        void SetUIElement(Object *c);
         //-------------------------------UI ELEMENTS-------------------------------------/////
-
-        void Menu();
-        void Inventory();
-
   
         void ScrollDebugWindow(int i){DebugTextBox->AddToScroll(i);}
         TextBox* GetDebugWindow() const {return DebugTextBox;}
         CoreEngine* GetEngine(){return Core;}
         void SetEngine(CoreEngine* e){this->Core = e;}
 
-        void Init(){SetCanvas();};
+        void Init(){SetUIElement();};
         
     protected:
     TextBox *DebugTextBox;

@@ -1,5 +1,5 @@
 #define UNICODE
-#define swprintf_s swprintf 
+#define swprintf_s swprintf
 
 #include <iostream>
 #include <chrono>
@@ -11,9 +11,7 @@
 #include <stdio.h>
 #include <memory>
 
-
 #include "Core/ToiEngine.h"
-
 
 using namespace std;
 
@@ -47,8 +45,10 @@ struct Direction
     }
 } direction;
 
-Canvas *Menu;
-Canvas *Inventory;
+Panel *Menu;
+Panel *Inventory;
+Panel *StatPanel;
+std::vector<Panel*> InventoryPanels;
 
 float fPlayerX = 32;
 float fPlayerY = 9;
@@ -83,11 +83,13 @@ void Debug(string s);
 void Debug(Vector2 v);
 void InitMenu();
 void InitInventory();
+void UpdateInventoryPanels();
+void SetInventoryPanels();
 
 float OldTime, currentTime, duration = 1.0;
 
 //CoreEngine* Engine;
-ToiEngine* Engine;
+ToiEngine *Engine;
 //Object* CameraWorldPos;
 int main()
 {
@@ -106,7 +108,7 @@ int main()
     float screenWH = Engine->GetRenderer()->GetScreenWidth() / 2.0;
     float screenHH = Engine->GetRenderer()->GetScreenHeight() / 2.0;
 
-    testLight =  new Object(Transform(Vector2(0, 5)), L"Light1", {"Light"}, {std::make_shared<Light>(0.1f, 0x0003)});
+    testLight = new Object(Transform(Vector2(0, 5)), L"Light1", {"Light"}, {std::make_shared<Light>(0.1f, 0x0003)});
     testLight2 = new Object(Transform(Vector2(8, 5)), L"Light2", {"Light"}, {std::make_shared<Light>(0.1f, 0x0004)});
 
     Engine->GetRenderer()->AddLight(testLight2);
@@ -114,27 +116,16 @@ int main()
 
     PlayerInformation = *Player->GetComponent<Character>();
 
-    Chest* c = new Chest(Gear::GEARTYPE::PLATE, 52, 1,
-     new cUISprite(Models::UI::chest_00, Vector2(5, 3), Vector2(3, 2), 0x000F), 
-     new cSprite(Models::Items::chest_00, Vector2(3, 2), Vector2(1, 1), 0x000F));
-
-    PlayerInformation.AddToInventory(*c);
-
-    //Player->AddChild(testLight);
-    //testLight->AddChild(testLight2);
     currentLevel->AddObject(testLight2);
     testLight2->AddChild(testLight);
 
-
     Engine->Init();
 
-    //Engine->GetPhysics()->SetObjectCollisionRefrence();
     InitInventory();
     InitMenu();
 
     while (1)
     {
-
 
         currentTime = Engine->GetCoreEngine()->Time - OldTime;
         int size = 0;
@@ -149,12 +140,18 @@ int main()
 
         //Debug(Engine->GetUI()->GetCanvasAt(0)->GetChildAt(4)->GetComponent<TextComponent>()->GetText());
         //Debug(Player->GetChildAt(0)->GetChildAt(0)->GetName());
+        //if(Player->GetComponent<Character>()->GetInventory().size() > 1)
 
         Engine->GetCoreEngine()->GetCamera()->t.SetPos((Player->t.GetTranslatedPosition()));
+        //Debug(StatPanel->GetChildAt(0)->t.GetPos());
+        //if (Player->GetComponent<Character>()->GetInventory().size() != 0)
+        //{
+        //    for (int i = 0; i < Player->GetComponent<Character>()->GetInventory().size(); i++)
+        //    {
+        //        //Debug(Player->GetComponent<Character>()->GetInventoryAt(i)->object->GetName());
+        //    }
+        //}
 
-        for(int i = 0; i < Engine->GetPhysics()->GetObjects()->size(); i++){
-            //Debug(Engine->GetPhysics()->GetObjects()->at(i)->t.GetPos());
-        }
         if (!Engine->GetCoreEngine()->IsFocused() && CurrentState == PLAY || !Engine->GetCoreEngine()->IsFocused() && CurrentState == INVENTORY)
         {
             CurrentState = PAUSED;
@@ -169,9 +166,10 @@ int main()
 
             //Engine->SetRenderWorldBool(false);
 
-            if(currentTime >= duration){
+            if (currentTime >= duration)
+            {
                 currentTime = 0;
-                OldTime = Engine->GetCoreEngine()->Time;    
+                OldTime = Engine->GetCoreEngine()->Time;
             }
 
             Menu->SetActive(false);
@@ -180,11 +178,12 @@ int main()
 
         if (CurrentState == INVENTORY)
         {
+                    UpdateInventoryPanels();
             Engine->SetRenderWorldBool(false);
             Menu->SetActive(false);
             Inventory->SetActive(true);
         }
-        
+
         if (CurrentState == PAUSED)
         {
             Engine->SetRenderWorldBool(false);
@@ -205,10 +204,8 @@ int main()
     return 0;
 }
 
-
 #include "GameMenu.cpp"
 #include "GameInventory.cpp"
-
 
 void Debug(wstring msg)
 {
@@ -235,7 +232,6 @@ void Debug(Vector2 v)
     Engine->GetUI()->Debug(s2ws(to_string((int)round(v.x)) + " " + to_string((int)round(v.y))));
 }
 
-
 //// upcast - implicit type cast allowed
 //  Parent *pParent = &child;
 //
@@ -252,7 +248,7 @@ void Input()
     if (CurrentState == PLAY)
     {
         float speed = 21.2f * Engine->GetCoreEngine()->DeltaTime;
-        Object* TestObject = Engine->GetCoreEngine()->GetSceneAt(0)->GetObjectAt(2);
+        Object *TestObject = Engine->GetCoreEngine()->GetSceneAt(0)->GetObjectAt(2);
         //Mouse has new scroll value
 
         if (Engine->GetCoreEngine()->GetKey((unsigned short)'F').bHeld)
@@ -278,7 +274,6 @@ void Input()
             direction.GoRight();
             //Engine->GetCoreEngine()->GetCamera()->t.AddToX(-speed);
             Player->t.AddToX(speed);
-         
         }
         if (Engine->GetCoreEngine()->GetKey((unsigned short)'W').bHeld)
         {

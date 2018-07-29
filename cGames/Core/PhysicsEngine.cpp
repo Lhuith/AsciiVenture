@@ -122,9 +122,7 @@ void PhysicsEngine::RemoveFromCleanUp(Object *o)
 {
     // erase-remove idiom.
     if (o->GetComponent<cSprite>() != nullptr)
-        o->GetComponent<cSprite>()->SetCol(o->GetComponent<cSprite>()->GetStoredCol());
-    else if (o->GetComponent<Item>() != nullptr)
-        o->GetComponent<Item>()->getWorldSprite()->SetCol(o->GetComponent<Item>()->getWorldSprite()->GetStoredCol());
+        o->GetComponent<cSprite>()->SetColor(o->GetComponent<cSprite>()->GetStoredColor());
 
     CleanUpCrew.erase(std::remove(CleanUpCrew.begin(), CleanUpCrew.end(), o), CleanUpCrew.end());
 }
@@ -134,9 +132,7 @@ void PhysicsEngine::AddToCleanUpCrew(Object *o)
     if (std::find(CleanUpCrew.begin(), CleanUpCrew.end(), o) == this->CleanUpCrew.end())
     {
         if (o->GetComponent<cSprite>() != nullptr)
-            o->GetComponent<cSprite>()->SetCol(0x0004);
-        else if (o->GetComponent<Item>() != nullptr)
-            o->GetComponent<Item>()->getWorldSprite()->SetCol(0x0004);
+            o->GetComponent<cSprite>()->SetColor(0x0004);
 
         CleanUpCrew.push_back(o);
     }
@@ -147,9 +143,9 @@ void PhysicsEngine::AddToCleanUpCrew(Object *o)
 //    if (std::find(collisions.begin(), collisions.end(), o) == this->collisions.end())
 //    {
 //        if (o->GetComponent<cSprite>() != nullptr)
-//            o->GetComponent<cSprite>()->SetCol(0x0004);
+//            o->GetComponent<cSprite>()->SetColor(0x0004);
 //        else if (o->GetComponent<Item>() != nullptr)
-//            o->GetComponent<Item>()->getWorldSprite()->SetCol(0x0004);
+//            o->GetComponent<Item>()->getWorldSprite()->SetColor(0x0004);
 //
 //        collisions.push_back(o);
 //    }
@@ -159,9 +155,7 @@ void PhysicsEngine::RemoveCollisions(Object *o)
 {
     // erase-remove idiom.
     if (o->GetComponent<cSprite>() != nullptr)
-        o->GetComponent<cSprite>()->SetCol(o->GetComponent<cSprite>()->GetStoredCol());
-    else if (o->GetComponent<Item>() != nullptr)
-        o->GetComponent<Item>()->getWorldSprite()->SetCol(o->GetComponent<Item>()->getWorldSprite()->GetStoredCol());
+        o->GetComponent<cSprite>()->SetColor(o->GetComponent<cSprite>()->GetStoredColor());
 
     collisions.erase(std::remove(collisions.begin(), collisions.end(), o), collisions.end());
 }
@@ -176,9 +170,9 @@ void PhysicsEngine::CollisionsDebug()
             //UI->Debug(o->t.GetPos());
 
             //if (o->GetComponent<cSprite>() != nullptr)
-            //    o->GetComponent<cSprite>()->SetCol(0x0004);
+            //    o->GetComponent<cSprite>()->SetColor(0x0004);
             //else if (o->GetComponent<Item>() != nullptr)
-            //    o->GetComponent<Item>()->getWorldSprite()->SetCol(0x0004);
+            //    o->GetComponent<Item>()->getWorldSprite()->SetColor(0x0004);
         }
     }
 }
@@ -197,16 +191,12 @@ void PhysicsEngine::PhysicsDebug(Object *o, bool condition)
             if (condition)
             {
                 if (o->GetComponent<cSprite>() != nullptr)
-                    o->GetComponent<cSprite>()->SetCol(0x0004);
-                else if (o->GetComponent<Item>() != nullptr)
-                    o->GetComponent<Item>()->getWorldSprite()->SetCol(0x0004);
+                    o->GetComponent<cSprite>()->SetColor(0x0004);
             }
             else
             {
                 if (o->GetComponent<cSprite>() != nullptr)
-                    o->GetComponent<cSprite>()->SetCol(o->GetComponent<cSprite>()->GetStoredCol());
-                else if (o->GetComponent<Item>() != nullptr)
-                    o->GetComponent<Item>()->getWorldSprite()->SetCol(o->GetComponent<Item>()->getWorldSprite()->GetStoredCol());
+                    o->GetComponent<cSprite>()->SetColor(o->GetComponent<cSprite>()->GetStoredColor());
             }
         }
     }

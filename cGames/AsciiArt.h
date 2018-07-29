@@ -24,22 +24,36 @@ namespace Models {
     }
     namespace UI {
         std::wstring potion_00(
-            L" | "  
-             "+-+"
-             "+-+");
-        std::wstring gloves_00(L"+");
-        std::wstring head_00(L"+-+"
-                              "+ +");
-        std::wstring chest_00(L"+---+"
-                               " |-| "
-                               " +-+ ");
-        std::wstring pants_00(L"---"
-                               "| |"
-                               "| |");
-        std::wstring boots_00(L"+ "
-                               "+-");
-        std::wstring boots_00_b(L" +"
-                               "-+");
+            L"   "  
+             " ▄ "
+             "▐█▌");
+        std::wstring gloves_00_slot(L"+");
+        std::wstring head_00_slot(L"+-+"
+                                   "+ +");
+        std::wstring chest_00_slot(L"+---+"
+                                    " |-| "
+                                    " +-+ ");
+        std::wstring pants_00_slot(L"---"
+                                    "| |"
+                                    "| |");
+        std::wstring boots_00_slot(L"+ "
+                                    "+-");
+        std::wstring boots_00_b_slot(L" +"
+                                      "-+");
+
+        std::wstring chest_00(L"▄▄▄"
+                               "▐█▌"
+                               "   ");
+
+        std::wstring pants_00(L"▄▄▄"
+                               "▌ ▐"
+                               "   ");
+
+
+        std::wstring head_00(L"   "
+                              "█▀█"
+                              "   ");
+
     }
 
     namespace Items {
@@ -47,6 +61,9 @@ namespace Models {
 
         std::wstring chest_00(L"▄▄▄"
                                "▐█▌");
+
+        std::wstring pants_00(L"▄▄"
+                               "▌▐");
 
         std::wstring head_00(L"∩");
     }

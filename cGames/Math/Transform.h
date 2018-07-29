@@ -12,6 +12,7 @@ class Transform : public Component {
         inline Vector2 GetPos()const{return this->position;}
         inline Vector2& GetPositionRefrence() {return this->position;}
 
+
         inline Vector2 GetOPos()const{return this->Origin;} //Position set at the beginning
         //inline void UpdateTransform(){}
 

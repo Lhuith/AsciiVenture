@@ -64,9 +64,7 @@ void RenderEngine::RenderScene()
     {
         Object *o = objects->at(i);
 
-        if (o->GetComponent<Item>() != nullptr)
-            RenderModel(*o->GetComponent<Item>()->getWorldSprite(), o->t.GetWorldPosition());
-        else if(o->GetComponent<cSprite>() != nullptr)
+       if(o->GetComponent<cSprite>() != nullptr)
             RenderModel(*o->GetComponent<cSprite>(), o->t.GetWorldPosition());
     }
 }
@@ -102,7 +100,6 @@ void RenderEngine::RenderSceneMap()
     }
 }
 
-//FIX THIS!~
 void RenderEngine::RenderModel(cSprite s, Vector2 p)
 {
     for (int i = 0; i < s.size.x; i++)
@@ -127,7 +124,7 @@ void RenderEngine::RenderModel(cSprite s, Vector2 p)
                 {
                     CHAR_INFO c;
                     c.Char.UnicodeChar = s.GetM()[j * (int)s.size.x + i];
-                    c.Attributes = s.GetCol();
+                    c.Attributes = s.GetColor();
                     //scene->SetAttAt(mIndex, c);
                     c.Attributes = RenderLight(c, mIndexX, mIndexY);
                     screenBuffer[(mIndexY) * this->nScreenWidth + mIndexX] = c;

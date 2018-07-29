@@ -1,18 +1,3 @@
-
-//struct LogFunction
-//{
-//  public:
-//    LogFunction(LogInfo _p = LogInfo(L"poo", 0)) : p(_p) {}
-//
-//    bool operator()(const LogInfo* l, const LogInfo* r)
-//    {
-//        return p == *l;
-//    }
-//
-//    public:
-//    LogInfo p;
-//};
-
 bool TextBox::HoverOver(float x, float y){
         Vector2 p0 = Vector2((float)(this->posX - (float)this->width - 1), (float)(this->posY + Renderer->GetScreenHeight() - this->height/2.0) + 1);
         Vector2 p1 = Vector2((float)(this->posX + (float)this->width - 1), (float)(this->posY + Renderer->GetScreenHeight()/2.0 + this->height/2.0) + 1);
