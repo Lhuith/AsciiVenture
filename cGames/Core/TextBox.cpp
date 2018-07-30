@@ -28,7 +28,7 @@ void TextBox::HightLight(int& m_mouseScroll, int& old_mouseScroll, float m_mouse
         }
 }
 
-void TextBox::DisplayTextBox()
+void TextBox::RenderTextBox(RenderEngine* Renderer)
 {
     for (int x = 0; x < this->width; x++)
         for (int y = 0; y < this->height; y++)

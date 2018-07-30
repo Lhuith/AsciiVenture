@@ -53,6 +53,7 @@ class Object
     //----------------------- CHILDREN --------------------------//
 
     void UpdateComponents();
+
     virtual void Init()
     {
         SetComponents();
@@ -64,10 +65,13 @@ class Object
         UpdateComponents();
         UpdateChildren();
     }
-    void Remove(Object *o);
-    virtual void Destroy() { Remove(this); }
 
-    void SetActive(bool b) { isActive = b; }
+    void Remove(Object *o);
+    
+    virtual void Destroy() { Remove(this); }
+    void SetChildActive(bool b);
+    void SetActive(bool b) { isActive = b; SetChildActive(b);}
+
     ~Object()
     {
         delete Parent;

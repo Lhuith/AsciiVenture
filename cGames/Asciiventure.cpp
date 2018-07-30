@@ -48,6 +48,7 @@ struct Direction
 Panel *Menu;
 Panel *Inventory;
 Panel *StatPanel;
+Panel* ToolTip;
 std::vector<Panel*> InventoryPanels;
 
 float fPlayerX = 32;
@@ -126,6 +127,8 @@ int main()
 
     while (1)
     {
+        ToolTip->t.SetWorldTransform(new Vector2(Engine->GetCoreEngine()->m_mousePosX + ToolTip->GetPanel().GetSize().x/2.0,
+         Engine->GetCoreEngine()->m_mousePosY - ToolTip->GetPanel().GetSize().y));
 
         currentTime = Engine->GetCoreEngine()->Time - OldTime;
         int size = 0;
@@ -161,9 +164,6 @@ int main()
         {
             Engine->SetRenderWorldBool(true);
 
-            Engine->GetUI()->SetShowMenu(false);
-            Engine->GetUI()->SetShowPause(false);
-
             //Engine->SetRenderWorldBool(false);
 
             if (currentTime >= duration)
@@ -178,7 +178,7 @@ int main()
 
         if (CurrentState == INVENTORY)
         {
-                    UpdateInventoryPanels();
+            UpdateInventoryPanels();
             Engine->SetRenderWorldBool(false);
             Menu->SetActive(false);
             Inventory->SetActive(true);

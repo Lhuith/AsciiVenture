@@ -39,20 +39,21 @@ void PanelComponent::HandleChildElements(int i, RenderEngine *Renderer, float mX
 {
     if (this->object->GetChildAt(i)->GetComponent<PanelComponent>() != nullptr)
     {
-        this->object->GetChildAt(i)->GetComponent<PanelComponent>()->RenderPanel(Renderer, mX, mY);
         InteractWithChildElement(*this->object->GetChildAt(i)->GetComponent<PanelComponent>(), mX, mY);
+        this->object->GetChildAt(i)->GetComponent<PanelComponent>()->RenderPanel(Renderer, mX, mY);
     }
 
     if (this->object->GetChildAt(i)->GetComponent<TextComponent>() != nullptr)
     {
-        this->object->GetChildAt(i)->GetComponent<TextComponent>()->RenderText(Renderer, this->GetSizeRef());
         InteractWithChildElement(*this->object->GetChildAt(i)->GetComponent<TextComponent>(), mX, mY);
+        this->object->GetChildAt(i)->GetComponent<TextComponent>()->RenderText(Renderer, this->GetSizeRef());
     }
 
     if (this->object->GetChildAt(i)->GetComponent<cUISpriteComponent>() != nullptr)
+
     {
-        this->object->GetChildAt(i)->GetComponent<cUISpriteComponent>()->RendercSprite(Renderer);
         InteractWithChildElement(*this->object->GetChildAt(i)->GetComponent<cUISpriteComponent>(), mX, mY);
+        this->object->GetChildAt(i)->GetComponent<cUISpriteComponent>()->RendercSprite(Renderer);
     }
 }
 
@@ -88,7 +89,7 @@ void PanelComponent::InteractWithChildElement(TextComponent &t, float mX, float 
     else if (t.Align == TextComponent::Alignment::C)
     {
 
-        if (HoverOver(mX, mY, Vector2(t.object->t.GetWorldPosition().x + this->GetSize().x/2.0 - t.GetSize().x/2.0 - 1, t.object->t.GetWorldPosition().y), t.GetSize()))
+        if (HoverOver(mX, mY, Vector2(t.object->t.GetWorldPosition().x + this->GetSize().x / 2.0 - t.GetSize().x / 2.0 - 1, t.object->t.GetWorldPosition().y), t.GetSize()))
         {
             t.SetColor(0x00C0);
         }
@@ -100,7 +101,7 @@ void PanelComponent::InteractWithChildElement(TextComponent &t, float mX, float 
     else if ((t.Align == TextComponent::Alignment::R))
     {
 
-        if (HoverOver(mX, mY, Vector2(t.object->t.GetWorldPosition().x + this->GetSize().x - t.GetSize().x/2.0 - 1, t.object->t.GetWorldPosition().y), t.GetSize()))
+        if (HoverOver(mX, mY, Vector2(t.object->t.GetWorldPosition().x + this->GetSize().x - t.GetSize().x / 2.0 - 1, t.object->t.GetWorldPosition().y), t.GetSize()))
         {
             t.SetColor(0x00C0);
         }

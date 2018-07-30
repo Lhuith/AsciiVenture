@@ -45,6 +45,16 @@ void Object::SetChild(Object *o)
     }
 }
 
+void Object::SetChildActive(bool b)
+{
+    if (children.size() != 0)
+    {
+        for (int i = 0; i < children.size(); i++)
+        {
+            children.at(i)->SetActive(b);
+        }
+    }
+}
 void Object::UpdateComponents()
 {
     if (components.size() != 0)

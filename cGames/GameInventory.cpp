@@ -3,6 +3,11 @@ void InitInventory()
     RenderEngine *r = Engine->GetRenderer();
 
     Inventory = new Panel(Vector2(0, 0), PanelComponent(Vector2(r->GetScreenWidth(), r->GetScreenHeight()), 0x0000));
+    ToolTip = new Panel(Vector2(0, 0), PanelComponent(Vector2(5, 5), 0x00F0));
+    ToolTip->t.SetWorldTransform(new Vector2(Engine->GetCoreEngine()->m_mousePosX + ToolTip->GetPanel().GetSize().x / 2.0,
+                                             Engine->GetCoreEngine()->m_mousePosY - ToolTip->GetPanel().GetSize().y));
+
+    Engine->GetUI()->AddUIElement(ToolTip);
 
     InventoryPanels = vector<Panel *>();
     SetInventoryPanels();
@@ -117,6 +122,7 @@ void SetInventoryPanels()
 
 void UpdateInventoryPanels()
 {
+
     int w = 9;
     int h = 4;
     int max = w * h;
@@ -124,17 +130,16 @@ void UpdateInventoryPanels()
     for (int j = 0; j < h; j++)
         for (int i = 0; i < w; i++)
         {
-            int index = i * InventoryPanels.size() + j;
+            int index = i * h + j;
 
             if ((int)Player->GetComponent<Character>()->GetInventory().size() != 0)
             {
                 if (index < (int)Player->GetComponent<Character>()->GetInventory().size())
                 {
                     Item *item = Player->GetComponent<Character>()->GetInventoryAt(index);
-                
-                    InventoryPanels.at(index)->AddChild(new CUISprite(Vector2(0,0), cUISpriteComponent(item->getUISprite()->GetM(),
-                     item->getUISprite()->GetSize(), Vector2(1,1), item->getUISprite()->GetColor())));
-                    continue;
+
+                    InventoryPanels.at(index)->AddChild(new CUISprite(Vector2(0, 0), cUISpriteComponent(item->getUISprite()->GetM(),
+                                                                                                        item->getUISprite()->GetSize(), Vector2(1, 1), item->getUISprite()->GetColor())));
                 }
             }
         }

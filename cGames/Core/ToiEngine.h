@@ -52,7 +52,7 @@ class ToiEngine
               RenderEngine *r = new RenderEngine(65, 20)) : Engine(new CoreEngine(ce->GetScenes(), new Camera(CameraComponent(r->GetScreenWidth(), r->GetScreenHeight())), r->GetSTDHConsole())),
                                                             Renderer(new RenderEngine(r->GetScreenWidth(), r->GetScreenHeight(), &ce->GetSceneAt(0)->objects, ce->GetSceneAt(0))),
                                                             Physics(new PhysicsEngine(&ce->GetSceneAt(0)->objects)),
-                                                            UI(new UIEngine(new TextBox(1, 1, 20, 5, {L"Debug"}, 0x0000 | 0x00F0), new TextBox(24, 1, 20, 5, {L"Game Text"}, 0x0000 | 0x000F), Renderer))
+                                                            UI(new UIEngine(new TextBox(24, 1, 20, 5, {L"Game Text"}, 0x0000 | 0x000F), Renderer))
     {
         Physics->SetEngine(Engine);
         Physics->SetUI(UI);
@@ -80,7 +80,6 @@ class ToiEngine
         UI->Update();
         Physics->Update();
         UI->GetDebugWindow()->HightLight(Engine->m_mouseScroll, Engine->old_mouseScroll, Engine->m_mousePosX, Engine->m_mousePosY);
-        //UI->Debug(Physics->GetEngine()->GetCamera()->GetName());
         Renderer->PrintGameInformation();
         Renderer->BlitToScreen();
     }

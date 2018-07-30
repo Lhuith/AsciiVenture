@@ -21,7 +21,7 @@ struct TextBox {
         posX(x), posY(y), width(w), height(h), messages(m), color(c), isScrollable(scroll){}
 
         WORD color;
-        void DisplayTextBox();
+        void RenderTextBox(RenderEngine* Renderer);
         void AddToTextBox(std::wstring msg);
         void Log(std::wstring msg);
         void SetRenderer(RenderEngine *re){Renderer = re;}
@@ -31,6 +31,9 @@ struct TextBox {
 
         inline int GetWidth() const {return width;}
         inline int GetHeight() const {return height;}
+
+        inline void SetPosX(float x){this->posX = x;}
+        inline void SetPosY(float y){this->posY = y;}
 
         inline int GetPosX() const {return posX;}
         inline int GetPosY() const {return posY;}
