@@ -7,24 +7,14 @@ void UIEngine::RenderUIElements()
         {
             if (UIElements.at(i)->isActive)
             {
-                //RenderCanvas(*UIElements.at(i));
-                if(UIElements.at(i)->GetComponent<PanelComponent>() != nullptr){
-                   UIElements.at(i)->GetComponent<PanelComponent>()->RenderBackGround(Renderer); 
-                   UIElements.at(i)->GetComponent<PanelComponent>()->RenderPanel(Renderer, m_mousePosX, m_mousePosY); 
+                if (UIElements.at(i)->GetComponent<PanelComponent>() != nullptr)
+                {
+                    UIElements.at(i)->GetComponent<PanelComponent>()->RenderBackGround(Renderer);
+                    UIElements.at(i)->GetComponent<PanelComponent>()->RenderPanel(Renderer);
                 }
             }
         }
     }
-}
-
-bool UIEngine::HoverOver(Vector2 pos, Vector2 size){
-        Vector2 p0 = Vector2((float)(pos.x), (float)(pos.y));
-        Vector2 p1 = Vector2((float)(pos.x + (float)size.x), (float)(pos.y + size.y));
-
-        if(pointInRect(m_mousePosX, m_mousePosY, p0, p1))
-           return true;
-
-        return false;
 }
 
 void UIEngine::SetUIElement()
@@ -40,7 +30,6 @@ void UIEngine::SetUIElement()
     }
 }
 
-
 void UIEngine::SetUIElement(Object *c)
 {
     c->t.SetWorldTransform(&c->t.GetPositionRefrence());
@@ -54,7 +43,13 @@ void UIEngine::UpdateUIElemnts()
     {
         for (int i = 0; i < UIElements.size(); i++)
         {
+            //Normal Object Update
             UIElements.at(i)->Update();
+
+            if (UIElements.at(i)->GetComponent<PanelComponent>() != nullptr)
+            {
+                UIElements.at(i)->GetComponent<PanelComponent>()->CheckInteractions(Renderer, m_mousePosX, m_mousePosY);
+            }
         }
     }
 }

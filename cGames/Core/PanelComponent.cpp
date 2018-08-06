@@ -1,4 +1,4 @@
-void PanelComponent::RenderPanel(RenderEngine *Renderer, float mX, float mY)
+void PanelComponent::RenderPanel(RenderEngine *Renderer)
 {
     PanelComponent p = *this;
     Vector2 pos = this->object->t.GetWorldPosition();
@@ -30,84 +30,117 @@ void PanelComponent::RenderPanel(RenderEngine *Renderer, float mX, float mY)
     {
         for (int i = 0; i < this->object->GetChildren().size(); i++)
         {
-            HandleChildElements(i, Renderer, mX, mY);
+            RenderChildren(i, Renderer);
         }
     }
 }
 
-void PanelComponent::HandleChildElements(int i, RenderEngine *Renderer, float mX, float mY)
+void PanelComponent::CheckInteractions(RenderEngine *Renderer, float mX, float mY)
+{
+    if(Getinteractive())
+    InteractWithElement(*this, mX, mY);
+
+    if (this->object->GetChildren().size() != 0)
+    {
+        for (int i = 0; i < this->object->GetChildren().size(); i++)
+        {
+            HandleChildInterAction(i, Renderer, mX, mY);
+        }
+    }
+}
+
+void PanelComponent::RenderChildren(int i, RenderEngine *Renderer)
 {
     if (this->object->GetChildAt(i)->GetComponent<PanelComponent>() != nullptr)
     {
-        InteractWithChildElement(*this->object->GetChildAt(i)->GetComponent<PanelComponent>(), mX, mY);
-        this->object->GetChildAt(i)->GetComponent<PanelComponent>()->RenderPanel(Renderer, mX, mY);
+        this->object->GetChildAt(i)->GetComponent<PanelComponent>()->RenderPanel(Renderer);
     }
 
     if (this->object->GetChildAt(i)->GetComponent<TextComponent>() != nullptr)
     {
-        InteractWithChildElement(*this->object->GetChildAt(i)->GetComponent<TextComponent>(), mX, mY);
         this->object->GetChildAt(i)->GetComponent<TextComponent>()->RenderText(Renderer, this->GetSizeRef());
     }
 
     if (this->object->GetChildAt(i)->GetComponent<cUISpriteComponent>() != nullptr)
-
     {
-        InteractWithChildElement(*this->object->GetChildAt(i)->GetComponent<cUISpriteComponent>(), mX, mY);
         this->object->GetChildAt(i)->GetComponent<cUISpriteComponent>()->RendercSprite(Renderer);
+    }
+}
+
+void PanelComponent::HandleChildInterAction(int i, RenderEngine *Renderer, float mX, float mY)
+{
+    if (this->object->GetChildAt(i)->GetComponent<PanelComponent>() != nullptr)
+    {
+        this->object->GetChildAt(i)->GetComponent<PanelComponent>()->CheckInteractions(Renderer, mX, mY);
+    }
+    else if (this->object->GetChildAt(i)->GetComponent<TextComponent>() != nullptr)
+    {
+        InteractWithElement(*this->object->GetChildAt(i)->GetComponent<TextComponent>(), mX, mY);
+    }
+    else if (this->object->GetChildAt(i)->GetComponent<cUISpriteComponent>() != nullptr)
+    {
+        InteractWithElement(*this->object->GetChildAt(i)->GetComponent<cUISpriteComponent>(), mX, mY);
     }
 }
 
 //Heads Up, Rectangles are rendered from pos -> to max size
 //doesnt start from centre so /2.0 work work
 
-void PanelComponent::InteractWithChildElement(PanelComponent &p, float mX, float mY)
+void PanelComponent::InteractWithElement(PanelComponent &p, float mX, float mY)
 {
     if (HoverOver(mX, mY, p.object->t.GetWorldPosition(), p.GetSize()))
     {
-        p.SetColor(0x00C0);
+        p.SetColor(0x000C | 0x00C0);
+        p.Settouching(true);
     }
     else
     {
         p.SetColor(p.GetStoredGetColor());
+        p.Settouching(false);
     }
 }
 
-void PanelComponent::InteractWithChildElement(TextComponent &t, float mX, float mY)
+void PanelComponent::InteractWithElement(TextComponent &t, float mX, float mY)
 {
     if (t.Align == TextComponent::Alignment::L)
     {
-
         if (HoverOver(mX, mY, Vector2(t.object->t.GetWorldPosition().x, t.object->t.GetWorldPosition().y), t.GetSize()))
         {
             t.SetColor(0x00C0);
+            t.Settouching(true);
         }
         else
         {
             t.SetColor(t.GetStoredGetColor());
+            t.Settouching(false);
         }
     }
     else if (t.Align == TextComponent::Alignment::C)
     {
 
-        if (HoverOver(mX, mY, Vector2(t.object->t.GetWorldPosition().x + this->GetSize().x / 2.0 - t.GetSize().x / 2.0 - 1, t.object->t.GetWorldPosition().y), t.GetSize()))
+        if (HoverOver(mX, mY, Vector2(t.object->t.GetWorldPosition().x + this->GetSize().x / 2.0 - (t.GetSize().x / 2.0), t.object->t.GetWorldPosition().y), t.GetSize()))
         {
             t.SetColor(0x00C0);
+            t.Settouching(true);
         }
         else
         {
             t.SetColor(t.GetStoredGetColor());
+            t.Settouching(false);
         }
     }
     else if ((t.Align == TextComponent::Alignment::R))
     {
 
-        if (HoverOver(mX, mY, Vector2(t.object->t.GetWorldPosition().x + this->GetSize().x - t.GetSize().x / 2.0 - 1, t.object->t.GetWorldPosition().y), t.GetSize()))
+        if (HoverOver(mX, mY, Vector2(t.object->t.GetWorldPosition().x + this->GetSize().x - (t.GetSize().x / 2.0 ), t.object->t.GetWorldPosition().y), t.GetSize()))
         {
             t.SetColor(0x00C0);
+            t.Settouching(true);
         }
         else
         {
             t.SetColor(t.GetStoredGetColor());
+            t.Settouching(false);
         }
     }
     else
@@ -116,23 +149,27 @@ void PanelComponent::InteractWithChildElement(TextComponent &t, float mX, float 
         if (HoverOver(mX, mY, t.object->t.GetWorldPosition(), t.GetSize()))
         {
             t.SetColor(0x00C0);
+            t.Settouching(true);
         }
         else
         {
             t.SetColor(t.GetStoredGetColor());
+            t.Settouching(false);
         }
     }
 }
 
-void PanelComponent::InteractWithChildElement(cUISpriteComponent &c, float mX, float mY)
+void PanelComponent::InteractWithElement(cUISpriteComponent &c, float mX, float mY)
 {
     if (HoverOver(mX, mY, c.object->t.GetWorldPosition(), c.GetSize()))
     {
-        c.SetColor(0x00C0);
+        c.SetColor(0x000C);
+        c.Settouching(true);
     }
     else
     {
         c.SetColor(c.GetStoredColor());
+        c.Settouching(false);
     }
 }
 

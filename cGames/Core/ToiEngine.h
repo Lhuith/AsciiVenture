@@ -77,9 +77,10 @@ class ToiEngine
             Renderer->RenderScene();
         }
 
-        UI->Update();
+   
         Physics->Update();
         UI->GetDebugWindow()->HightLight(Engine->m_mouseScroll, Engine->old_mouseScroll, Engine->m_mousePosX, Engine->m_mousePosY);
+        UI->Update();
         Renderer->PrintGameInformation();
         Renderer->BlitToScreen();
     }

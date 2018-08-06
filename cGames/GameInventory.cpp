@@ -2,12 +2,7 @@ void InitInventory()
 {
     RenderEngine *r = Engine->GetRenderer();
 
-    Inventory = new Panel(Vector2(0, 0), PanelComponent(Vector2(r->GetScreenWidth(), r->GetScreenHeight()), 0x0000));
-    ToolTip = new Panel(Vector2(0, 0), PanelComponent(Vector2(5, 5), 0x00F0));
-    ToolTip->t.SetWorldTransform(new Vector2(Engine->GetCoreEngine()->m_mousePosX + ToolTip->GetPanel().GetSize().x / 2.0,
-                                             Engine->GetCoreEngine()->m_mousePosY - ToolTip->GetPanel().GetSize().y));
-
-    Engine->GetUI()->AddUIElement(ToolTip);
+    Inventory = new Panel(Vector2(0, 0), PanelComponent(Vector2(r->GetScreenWidth(), r->GetScreenHeight()), 0x0000, false));
 
     InventoryPanels = vector<Panel *>();
     SetInventoryPanels();
@@ -18,28 +13,15 @@ void InitInventory()
     Inventory->AddChild(new Panel(Vector2(2, 2), PanelComponent(Vector2(11, 15), 0x00F0)));
     Inventory->AddChild(new Text(Vector2(2, 1), TextComponent(L"GEAR", 0x0000 | 0x00F0, TextComponent::Alignment::L)));
 
-    Inventory->AddChild(new Panel(Vector2(6, 3), PanelComponent(Vector2(3, 2), 0x000F | 0x0000)));
-    //cUISprite(Models::UI::head_00_slot, Vector2(3, 2), Vector2(3, 2), 0x000F)
+    Inventory->AddChild(new Panel(Vector2(6, 3), PanelComponent(Vector2(3, 2), 0x000F | 0x0000, true)));
+    Inventory->AddChild(new Panel(Vector2(5, 6), PanelComponent(Vector2(5, 3), 0x000F | 0x0000, true)));
+    Inventory->AddChild(new Panel(Vector2(6, 10), PanelComponent(Vector2(3, 3), 0x000F | 0x0000, true)));
+    Inventory->AddChild(new Panel(Vector2(3, 9), PanelComponent(Vector2(1, 1), 0x000F | 0x0000, true)));
+    Inventory->AddChild(new Panel(Vector2(11, 9), PanelComponent(Vector2(1, 1), 0x000F | 0x0000, true)));
+    Inventory->AddChild(new Panel(Vector2(5, 14), PanelComponent(Vector2(2, 2), 0x000F | 0x0000, true)));
+    Inventory->AddChild(new Panel(Vector2(8, 14), PanelComponent(Vector2(2, 2), 0x000F | 0x0000, true)));
 
-    Inventory->AddChild(new Panel(Vector2(5, 6), PanelComponent(Vector2(5, 3), 0x000F | 0x0000)));
-    //cUISprite(Models::UI::chest_00_slot, Vector2(5, 3), Vector2(3, 2), 0x000F)
-
-    Inventory->AddChild(new Panel(Vector2(6, 10), PanelComponent(Vector2(3, 3), 0x000F | 0x0000)));
-    //cUISprite(Models::UI::pants_00_slot, Vector2(3, 3), Vector2(3, 2), 0x000F)
-
-    Inventory->AddChild(new Panel(Vector2(3, 9), PanelComponent(Vector2(1, 1), 0x000F | 0x0000)));
-    //cUISprite(Models::UI::gloves_00_slot, Vector2(1, 1), Vector2(3, 2), 0x000F)
-
-    Inventory->AddChild(new Panel(Vector2(11, 9), PanelComponent(Vector2(1, 1), 0x000F | 0x0000)));
-    //cUISprite(Models::UI::gloves_00_slot, Vector2(1, 1), Vector2(3, 2), 0x000F)
-
-    Inventory->AddChild(new Panel(Vector2(5, 14), PanelComponent(Vector2(2, 2), 0x000F | 0x0000)));
-    //cUISprite(Models::UI::boots_00_b_slot, Vector2(2, 2), Vector2(3, 2), 0x000F)
-
-    Inventory->AddChild(new Panel(Vector2(8, 14), PanelComponent(Vector2(2, 2), 0x000F | 0x0000)));
-    //cUISprite(Models::UI::boots_00_slot, Vector2(2, 2), Vector2(3, 2), 0x000F)
-
-    StatPanel = new Panel(Vector2(r->GetScreenWidth() - 15, 2), PanelComponent(Vector2(13, 15), 0x00F0));
+    StatPanel = new Panel(Vector2(r->GetScreenWidth() - 15, 2), PanelComponent(Vector2(13, 15), 0x00F0, false));
     Inventory->AddChild(StatPanel);
 
     wstring staminaTitle = L"Stamina: ";
@@ -96,6 +78,14 @@ void InitInventory()
 
     Inventory->SetActive(false);
     Engine->GetUI()->AddUIElement(Inventory);
+
+    ToolTip = new Panel(Vector2(0, 0), PanelComponent(Vector2(12, 5), 0x00F0));
+    ToolTip->t.SetWorldTransform(new Vector2(Engine->GetCoreEngine()->m_mousePosX + ToolTip->GetPanel().GetSize().x / 2.0,
+                                             Engine->GetCoreEngine()->m_mousePosY - ToolTip->GetPanel().GetSize().y));
+    ToolTip->SetActive(false);
+    ToolTip->AddChild(new Text(Vector2(0, 0), TextComponent(L"Name", 0x000F, TextComponent::Alignment::L, false)));
+    ToolTip->AddChild(new Text(Vector2(0, 1), TextComponent(L"Information", 0x000F, TextComponent::Alignment::L, false)));
+    Engine->GetUI()->AddUIElement(ToolTip);
 }
 
 void SetInventoryPanels()
@@ -114,7 +104,7 @@ void SetInventoryPanels()
 
             Vector2 v = Vector2(i * (sizeX + 1) + 14, j * (sizeY + 1) + 2);
 
-            Panel *p = new Panel(v, PanelComponent(Vector2(sizeX, sizeY), 0x000A | 0x00A0));
+            Panel *p = new Panel(v, PanelComponent(Vector2(sizeX, sizeY), 0x000A | 0x00A0, false));
             InventoryPanels.push_back(p);
             Inventory->AddChild(p);
         }
@@ -143,4 +133,88 @@ void UpdateInventoryPanels()
                 }
             }
         }
+}
+
+void HandleToolTip()
+{
+    ToolTip->SetActive(false);
+    bool isTouching = false;
+    Object *object = nullptr;
+    wstring text = L"poopoo";
+
+    for (int i = 0; i < Engine->GetUI()->GetUIElements().size(); i++)
+    {
+        if (Engine->GetUI()->GetUIElements().at(i)->GetComponent<PanelComponent>() != nullptr)
+        {
+            isTouching = IsUITouching(Engine->GetUI()->GetUIElements().at(i), text);
+
+            if(isTouching)
+                break;
+        }
+    }
+
+    if (isTouching)
+    {
+        ToolTip->SetActive(true);
+        ToolTip->GetChildAt(0)->GetComponent<TextComponent>()->SetText(text);
+    }
+    else
+    {
+        ToolTip->SetActive(false);
+        ToolTip->GetChildAt(0)->GetComponent<TextComponent>()->SetText(L"Poo");
+    }
+}
+
+bool IsUITouching(Object *o, wstring& text)
+{
+    if (o->GetComponent<PanelComponent>() != nullptr)
+    {
+        if (o->GetComponent<PanelComponent>()->Gettouching())
+        {
+            text = o->GetName();
+            return true;
+        }
+    }
+
+    if (o->GetChildren().size() != 0)
+    {
+        for (int j = 0; j < o->GetChildren().size(); j++)
+        {
+            if (o->GetChildAt(j)->GetComponent<PanelComponent>() != nullptr)
+            {
+                
+                if(IsUITouching(o->GetChildAt(j), text))
+                    return true;
+
+                //if (o->GetChildAt(j)->GetComponent<PanelComponent>()->Gettouching())
+                //{
+                //    return true;
+                //}
+            }
+
+            if (o->GetChildAt(j)->GetComponent<TextComponent>() != nullptr)
+            {
+                if (o->GetChildAt(j)->GetComponent<TextComponent>()->Gettouching())
+                {
+                    text = o->GetChildAt(j)->GetComponent<TextComponent>()->GetText();
+                    return true;
+                }
+            }
+
+            if (o->GetChildAt(j)->GetComponent<cUISpriteComponent>() != nullptr)
+            {
+                if (o->GetChildAt(j)->GetComponent<cUISpriteComponent>()->Gettouching())
+                {
+                    text = o->GetChildAt(j)->GetComponent<Item>()->object->GetName();
+                    return true;
+                }
+            }
+        }
+    }
+    else
+    {
+        return false;
+    }
+
+    return false;
 }

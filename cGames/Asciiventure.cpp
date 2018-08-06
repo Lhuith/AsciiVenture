@@ -48,8 +48,8 @@ struct Direction
 Panel *Menu;
 Panel *Inventory;
 Panel *StatPanel;
-Panel* ToolTip;
-std::vector<Panel*> InventoryPanels;
+Panel *ToolTip;
+std::vector<Panel *> InventoryPanels;
 
 float fPlayerX = 32;
 float fPlayerY = 9;
@@ -86,6 +86,8 @@ void InitMenu();
 void InitInventory();
 void UpdateInventoryPanels();
 void SetInventoryPanels();
+void HandleToolTip();
+bool IsUITouching(Object *o, wstring& text);
 
 float OldTime, currentTime, duration = 1.0;
 
@@ -127,33 +129,22 @@ int main()
 
     while (1)
     {
-        ToolTip->t.SetWorldTransform(new Vector2(Engine->GetCoreEngine()->m_mousePosX + ToolTip->GetPanel().GetSize().x/2.0,
-         Engine->GetCoreEngine()->m_mousePosY - ToolTip->GetPanel().GetSize().y));
+
+        if (ToolTip->t.GetPos().y + ToolTip->GetPanel().GetSize().y < Engine->GetRenderer()->GetScreenHeight())
+        {
+            ToolTip->t.SetWorldTransform(new Vector2(Engine->GetCoreEngine()->m_mousePosX + ToolTip->GetPanel().GetSize().x / 2.0,
+                                                     Engine->GetCoreEngine()->m_mousePosY - ToolTip->GetPanel().GetSize().y));
+        }
 
         currentTime = Engine->GetCoreEngine()->Time - OldTime;
         int size = 0;
 
-        //if(Player->GetComponent<Collider>() != nullptr)
-        //size = (int)();
-
-        //Debug(Player->GetTags().at(0));
+        UpdateInventoryPanels();
 
         Engine->EngineUpdate();
         Input();
 
-        //Debug(Engine->GetUI()->GetCanvasAt(0)->GetChildAt(4)->GetComponent<TextComponent>()->GetText());
-        //Debug(Player->GetChildAt(0)->GetChildAt(0)->GetName());
-        //if(Player->GetComponent<Character>()->GetInventory().size() > 1)
-
         Engine->GetCoreEngine()->GetCamera()->t.SetPos((Player->t.GetTranslatedPosition()));
-        //Debug(StatPanel->GetChildAt(0)->t.GetPos());
-        //if (Player->GetComponent<Character>()->GetInventory().size() != 0)
-        //{
-        //    for (int i = 0; i < Player->GetComponent<Character>()->GetInventory().size(); i++)
-        //    {
-        //        //Debug(Player->GetComponent<Character>()->GetInventoryAt(i)->object->GetName());
-        //    }
-        //}
 
         if (!Engine->GetCoreEngine()->IsFocused() && CurrentState == PLAY || !Engine->GetCoreEngine()->IsFocused() && CurrentState == INVENTORY)
         {
@@ -164,8 +155,6 @@ int main()
         {
             Engine->SetRenderWorldBool(true);
 
-            //Engine->SetRenderWorldBool(false);
-
             if (currentTime >= duration)
             {
                 currentTime = 0;
@@ -174,11 +163,13 @@ int main()
 
             Menu->SetActive(false);
             Inventory->SetActive(false);
+            ToolTip->SetActive(false);
+            //HandleToolTip();
         }
 
         if (CurrentState == INVENTORY)
         {
-            UpdateInventoryPanels();
+
             Engine->SetRenderWorldBool(false);
             Menu->SetActive(false);
             Inventory->SetActive(true);
@@ -190,6 +181,8 @@ int main()
             Menu->SetActive(true);
             Inventory->SetActive(false);
         }
+
+        HandleToolTip();
     }
 
     Engine->GetRenderer()->ResetConsoleMode();

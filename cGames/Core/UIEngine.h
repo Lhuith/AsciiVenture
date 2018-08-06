@@ -28,13 +28,11 @@ class UIEngine
         m_mousePosY = Core->m_mousePosY;
     }
 
-    bool HoverOver(Vector2 pos, Vector2 size);
-
     //---------------------------------UPDATE---------------------------------///////
     void Update()
     {
-        UpdateUIElemnts();
         UpdateUIInput();
+        UpdateUIElemnts();
 
         GameTextBox->RenderTextBox(Renderer);
 
@@ -53,6 +51,7 @@ class UIEngine
     //-------------------------------UI ELEMENTS-------------------------------------/////
     std::vector<Object *> GetUIElements() { return UIElements; }
     Object *GetCanvasAt(int i) { return UIElements.at(0); }
+    
     void AddUIElement(Object *c)
     {
         UIElements.push_back(c);

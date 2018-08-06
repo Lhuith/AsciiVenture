@@ -3,10 +3,10 @@ class UIComponent : public Component
 {
   WORD color, stored_color;
   Vector2 size;
-  bool hover;
+  bool interactive, touching = false;
 
 public:
-  explicit UIComponent(WORD c = 0x000F, Vector2 s = Vector2(1, 1), bool b = false) : color(c), size(s), stored_color(c), hover(b) {}
+  explicit UIComponent(WORD c = 0x000F, Vector2 s = Vector2(1, 1), bool b = false) : color(c), size(s), stored_color(c), interactive(b) {}
 
   Vector2 GetSize() const { return size; }
   Vector2 *GetSizeRef() { return &size; }
@@ -14,7 +14,13 @@ public:
   WORD GetColor() const { return color; }
   void SetColor(WORD c) { this->color = c; }
   WORD GetStoredGetColor() const { return stored_color; }
-  void Sethover(bool b) { hover = b; }
+
+  void Setinteractive(bool b) { interactive = b; }
+  bool Getinteractive() { return interactive; }
+
+  void Settouching(bool b) { touching = b; }
+  bool Gettouching() { return touching; }
+
   void OverrideColor(WORD c)
   {
     this->color = c;
@@ -38,6 +44,8 @@ public:
   std::wstring GetText() const { return text; }
   Alignment GetAlignment() const { return Align; }
   void RenderText(RenderEngine *Renderer, Vector2 *PanelSize = nullptr);
+  void SetText(std::wstring t){text = t;}
+  void AddText(std::wstring t){text = text + t;}
 };
 #include "TextComponent.cpp"
 
@@ -52,12 +60,31 @@ public:
 
 class cUISpriteComponent : public cSprite
 {
-  bool hover;
+  bool interactive, touching = false;
+
 public:
   cUISpriteComponent(std::wstring m = L"?", Vector2 s = Vector2(0, 0), Vector2 c = Vector2(0, 0), WORD col = 0x000F, bool b = false)
-      : cSprite(m, s, c, col), hover(b){};
+      : cSprite(m, s, c, col), interactive(b){};
   void RendercSprite(RenderEngine *Renderer);
-    void Sethover(bool b) { hover = b; }
+
+  void Setinteractive(bool b) { interactive = b; }
+  bool Getinteractive() { return interactive; }
+
+  void Settouching(bool b) { touching = b; }
+  bool Gettouching() { return touching; }
+
+  void Update()
+  {
+
+    if (touching)
+    {
+      this->SetColor(0x000F | 0x00D0);
+    }
+    else
+    {
+      this->SetColor(GetStoredColor());
+    }
+  }
 };
 
 #include "cUISpriteComponent.cpp"
@@ -68,9 +95,9 @@ class CUISprite : public Object
 
 public:
   explicit CUISprite(Vector2 pos, cUISpriteComponent s = cUISpriteComponent()) : Object(Transform(pos), L"Sprite", {"UI"},
-      {std::make_shared<cUISpriteComponent>(s)}), sprite(s) {}
+                                                                                        {std::make_shared<cUISpriteComponent>(s)}),
+                                                                                 sprite(s) {}
   cUISpriteComponent GetUISprite() { return sprite; }
-
 };
 
 class PanelComponent : public UIComponent
@@ -79,14 +106,16 @@ class PanelComponent : public UIComponent
 public:
   explicit PanelComponent(Vector2 s = Vector2(1, 1), WORD c = 0x000F | 0x0000, bool b = false) : UIComponent(c, s, b) {}
 
-  void RenderPanel(RenderEngine *Renderer, float mX, float mY);
+  void RenderPanel(RenderEngine *Renderer);
   void RenderBackGround(RenderEngine *Renderer);
   bool HoverOver(float mousex, float mousey, Vector2 pos, Vector2 size);
-  void HandleChildElements(int i, RenderEngine* Renderer, float mX, float mY);
-  void InteractWithChildElement(PanelComponent& p, float mX, float mY);
-  void InteractWithChildElement(TextComponent& t, float mX, float mY);
-  void InteractWithChildElement(cUISpriteComponent& c, float mX, float mY);
-  
+  void HandleChildInterAction(int i, RenderEngine *Renderer, float mX, float mY);
+  void InteractWithElement(PanelComponent &p, float mX, float mY);
+  void InteractWithElement(TextComponent &t, float mX, float mY);
+  void InteractWithElement(cUISpriteComponent &c, float mX, float mY);
+  void CheckInteractions(RenderEngine *Renderer, float mX, float mY);
+  void RenderChildren(int i, RenderEngine *Renderer);
+
 protected:
 };
 #include "PanelComponent.cpp"
