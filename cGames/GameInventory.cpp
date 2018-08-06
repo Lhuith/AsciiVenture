@@ -144,12 +144,15 @@ void HandleToolTip()
 
     for (int i = 0; i < Engine->GetUI()->GetUIElements().size(); i++)
     {
-        if (Engine->GetUI()->GetUIElements().at(i)->GetComponent<PanelComponent>() != nullptr)
+        if (Engine->GetUI()->GetUIElements().at(i)->isActive)
         {
-            isTouching = IsUITouching(Engine->GetUI()->GetUIElements().at(i), text);
+            if (Engine->GetUI()->GetUIElements().at(i)->GetComponent<PanelComponent>() != nullptr)
+            {
+                isTouching = IsUITouching(Engine->GetUI()->GetUIElements().at(i), text);
 
-            if(isTouching)
-                break;
+                if (isTouching)
+                    break;
+            }
         }
     }
 
@@ -165,7 +168,7 @@ void HandleToolTip()
     }
 }
 
-bool IsUITouching(Object *o, wstring& text)
+bool IsUITouching(Object *o, wstring &text)
 {
     if (o->GetComponent<PanelComponent>() != nullptr)
     {
@@ -182,14 +185,10 @@ bool IsUITouching(Object *o, wstring& text)
         {
             if (o->GetChildAt(j)->GetComponent<PanelComponent>() != nullptr)
             {
-                
-                if(IsUITouching(o->GetChildAt(j), text))
+
+                if (IsUITouching(o->GetChildAt(j), text))
                     return true;
 
-                //if (o->GetChildAt(j)->GetComponent<PanelComponent>()->Gettouching())
-                //{
-                //    return true;
-                //}
             }
 
             if (o->GetChildAt(j)->GetComponent<TextComponent>() != nullptr)
@@ -205,7 +204,7 @@ bool IsUITouching(Object *o, wstring& text)
             {
                 if (o->GetChildAt(j)->GetComponent<cUISpriteComponent>()->Gettouching())
                 {
-                    text = o->GetChildAt(j)->GetComponent<Item>()->object->GetName();
+                    text = o->GetChildAt(j)->GetComponent<cUISpriteComponent>()->object->GetName();
                     return true;
                 }
             }
