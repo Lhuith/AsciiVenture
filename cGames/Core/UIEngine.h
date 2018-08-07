@@ -8,6 +8,7 @@ class UIEngine
 
     int m_mousePosX;
     int m_mousePosY;
+    bool m_click_0;
 
     std::vector<Object *> UIElements;
 
@@ -26,6 +27,12 @@ class UIEngine
     {
         m_mousePosX = Core->m_mousePosX;
         m_mousePosY = Core->m_mousePosY;
+
+        if(Core->GetMouse(0).bPressed){
+            m_click_0 = true;
+        } else {
+            m_click_0 = false;
+        }
     }
 
     //---------------------------------UPDATE---------------------------------///////

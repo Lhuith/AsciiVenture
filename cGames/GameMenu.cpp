@@ -15,6 +15,10 @@ void InitMenu()
     Menu->AddChild(new Text(Vector2(0, (r->GetScreenHeight() / 2.0) - 3 + hOffset), TextComponent( L"Save", 0x000F)));
     Menu->AddChild(new Text(Vector2(0, (r->GetScreenHeight() / 2.0) - 2 + hOffset), TextComponent( L"Load", 0x000F)));
     Menu->AddChild(new Text(Vector2(0, (r->GetScreenHeight() / 2.0) - 1 + hOffset), TextComponent( L"Quit", 0x000F)));
+
+    Menu->AddChild(new Slider(Vector2(2, (r->GetScreenHeight() / 2.0) - 0 + hOffset), SliderComponent(Vector2(0,0), Vector2(10,0), 0x000D | 0x00F0, true)));
+    Menu->AddChild(new CheckBox(Vector2(2, (r->GetScreenHeight() / 2.0) + 1 + hOffset), CheckBoxComponent(0x000D|0x00F0, true)));
+
     Menu->SetActive(false);
     Engine->GetUI()->AddUIElement(Menu);
 }

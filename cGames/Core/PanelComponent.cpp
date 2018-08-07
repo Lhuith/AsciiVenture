@@ -35,16 +35,16 @@ void PanelComponent::RenderPanel(RenderEngine *Renderer)
     }
 }
 
-void PanelComponent::CheckInteractions(RenderEngine *Renderer, float mX, float mY)
+void PanelComponent::CheckInteractions(RenderEngine *Renderer, float mX, float mY, bool clicked)
 {
-    if(Getinteractive())
-    InteractWithElement(*this, mX, mY);
+    if (Getinteractive())
+        InteractWithElement(*this, mX, mY, clicked);
 
     if (this->object->GetChildren().size() != 0)
     {
         for (int i = 0; i < this->object->GetChildren().size(); i++)
         {
-            HandleChildInterAction(i, Renderer, mX, mY);
+            HandleChildInterAction(i, Renderer, mX, mY, clicked);
         }
     }
 }
@@ -55,133 +55,74 @@ void PanelComponent::RenderChildren(int i, RenderEngine *Renderer)
     {
         this->object->GetChildAt(i)->GetComponent<PanelComponent>()->RenderPanel(Renderer);
     }
-
     if (this->object->GetChildAt(i)->GetComponent<TextComponent>() != nullptr)
     {
         this->object->GetChildAt(i)->GetComponent<TextComponent>()->RenderText(Renderer, this->GetSizeRef());
     }
-
     if (this->object->GetChildAt(i)->GetComponent<cUISpriteComponent>() != nullptr)
     {
         this->object->GetChildAt(i)->GetComponent<cUISpriteComponent>()->RendercSprite(Renderer);
     }
+    if (this->object->GetChildAt(i)->GetComponent<SliderComponent>() != nullptr)
+    {
+        this->object->GetChildAt(i)->GetComponent<SliderComponent>()->RenderSlider(Renderer);
+    }
+    if (this->object->GetChildAt(i)->GetComponent<CheckBoxComponent>() != nullptr)
+    {
+        this->object->GetChildAt(i)->GetComponent<CheckBoxComponent>()->RenderCheckBox(Renderer);
+    }
 }
 
-void PanelComponent::HandleChildInterAction(int i, RenderEngine *Renderer, float mX, float mY)
+void PanelComponent::HandleChildInterAction(int i, RenderEngine *Renderer, float mX, float mY, bool clicked)
 {
     if (this->object->GetChildAt(i)->GetComponent<PanelComponent>() != nullptr)
     {
-        this->object->GetChildAt(i)->GetComponent<PanelComponent>()->CheckInteractions(Renderer, mX, mY);
+        this->object->GetChildAt(i)->GetComponent<PanelComponent>()->CheckInteractions(Renderer, mX, mY, clicked);
     }
     else if (this->object->GetChildAt(i)->GetComponent<TextComponent>() != nullptr)
     {
-        InteractWithElement(*this->object->GetChildAt(i)->GetComponent<TextComponent>(), mX, mY);
+        InteractWithElement(*this->object->GetChildAt(i)->GetComponent<TextComponent>(), mX, mY, clicked);
     }
     else if (this->object->GetChildAt(i)->GetComponent<cUISpriteComponent>() != nullptr)
     {
-        InteractWithElement(*this->object->GetChildAt(i)->GetComponent<cUISpriteComponent>(), mX, mY);
+        InteractWithElement(*this->object->GetChildAt(i)->GetComponent<cUISpriteComponent>(), mX, mY, clicked);
+    }
+    else if (this->object->GetChildAt(i)->GetComponent<SliderComponent>() != nullptr)
+    {
+        InteractWithElement(*this->object->GetChildAt(i)->GetComponent<SliderComponent>(), mX, mY, clicked);
+    }
+    else if (this->object->GetChildAt(i)->GetComponent<CheckBoxComponent>() != nullptr)
+    {
+        InteractWithElement(*this->object->GetChildAt(i)->GetComponent<CheckBoxComponent>(), mX, mY, clicked);
     }
 }
 
 //Heads Up, Rectangles are rendered from pos -> to max size
 //doesnt start from centre so /2.0 work work
 
-void PanelComponent::InteractWithElement(PanelComponent &p, float mX, float mY)
+void PanelComponent::InteractWithElement(PanelComponent &p, float mX, float mY, bool clicked)
 {
-    if (HoverOver(mX, mY, p.object->t.GetWorldPosition(), p.GetSize()))
-    {
-        p.SetColor(0x000C | 0x00C0);
-        p.Settouching(true);
-    }
-    else
-    {
-        p.SetColor(p.GetStoredGetColor());
-        p.Settouching(false);
-    }
+    p.HoverOver(mX, mY, clicked);
 }
 
-void PanelComponent::InteractWithElement(TextComponent &t, float mX, float mY)
+void PanelComponent::InteractWithElement(TextComponent &t, float mX, float mY, bool clicked)
 {
-    if (t.Align == TextComponent::Alignment::L)
-    {
-        if (HoverOver(mX, mY, Vector2(t.object->t.GetWorldPosition().x, t.object->t.GetWorldPosition().y), t.GetSize()))
-        {
-            t.SetColor(0x00C0);
-            t.Settouching(true);
-        }
-        else
-        {
-            t.SetColor(t.GetStoredGetColor());
-            t.Settouching(false);
-        }
-    }
-    else if (t.Align == TextComponent::Alignment::C)
-    {
-
-        if (HoverOver(mX, mY, Vector2(t.object->t.GetWorldPosition().x + this->GetSize().x / 2.0 - (t.GetSize().x / 2.0), t.object->t.GetWorldPosition().y), t.GetSize()))
-        {
-            t.SetColor(0x00C0);
-            t.Settouching(true);
-        }
-        else
-        {
-            t.SetColor(t.GetStoredGetColor());
-            t.Settouching(false);
-        }
-    }
-    else if ((t.Align == TextComponent::Alignment::R))
-    {
-
-        if (HoverOver(mX, mY, Vector2(t.object->t.GetWorldPosition().x + this->GetSize().x - (t.GetSize().x / 2.0 ), t.object->t.GetWorldPosition().y), t.GetSize()))
-        {
-            t.SetColor(0x00C0);
-            t.Settouching(true);
-        }
-        else
-        {
-            t.SetColor(t.GetStoredGetColor());
-            t.Settouching(false);
-        }
-    }
-    else
-    {
-
-        if (HoverOver(mX, mY, t.object->t.GetWorldPosition(), t.GetSize()))
-        {
-            t.SetColor(0x00C0);
-            t.Settouching(true);
-        }
-        else
-        {
-            t.SetColor(t.GetStoredGetColor());
-            t.Settouching(false);
-        }
-    }
+    t.HoverOver(mX, mY, clicked, this);
 }
 
-void PanelComponent::InteractWithElement(cUISpriteComponent &c, float mX, float mY)
+void PanelComponent::InteractWithElement(cUISpriteComponent &c, float mX, float mY, bool clicked)
 {
-    if (HoverOver(mX, mY, c.object->t.GetWorldPosition(), c.GetSize()))
-    {
-        c.SetColor(0x000C);
-        c.Settouching(true);
-    }
-    else
-    {
-        c.SetColor(c.GetStoredColor());
-        c.Settouching(false);
-    }
+    c.HoverOver(mX, mY, clicked);
 }
 
-bool PanelComponent::HoverOver(float mousex, float mousey, Vector2 pos, Vector2 size)
+void PanelComponent::InteractWithElement(SliderComponent &sl, float mX, float mY, bool clicked)
 {
-    Vector2 p0 = Vector2((pos.x), (pos.y));
-    Vector2 p1 = Vector2((pos.x + size.x), (pos.y + size.y));
+    sl.HoverOver(mX, mY, clicked);
+}
 
-    if (pointInRect(mousex, mousey, p0, p1))
-        return true;
-
-    return false;
+void PanelComponent::InteractWithElement(CheckBoxComponent &bx, float mX, float mY, bool clicked)
+{
+    bx.HoverOver(mX, mY, clicked);
 }
 
 void PanelComponent::RenderBackGround(RenderEngine *Renderer)

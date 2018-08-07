@@ -91,6 +91,7 @@ class CoreEngine
     bool IsFocused() { return m_bConsoleInFocus; }
     inline Object *GetCamera() { return (Object *)MainCamera; }
     sKeyState GetKey(int nKeyID) { return m_keys[nKeyID]; }
+    sKeyState GetMouse(int nMouseButtonID) { return m_mouse[nMouseButtonID]; }
     inline std::vector<Scene *> GetScenes() { return Scenes; }
 
   protected:

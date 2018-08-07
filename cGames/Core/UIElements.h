@@ -20,13 +20,28 @@ public:
 
   void Settouching(bool b) { touching = b; }
   bool Gettouching() { return touching; }
-
+  virtual void HoverOver(float mousex, float mousey, bool clicked);
   void OverrideColor(WORD c)
   {
     this->color = c;
     this->stored_color = c;
   }
+
+  void Update()
+  {
+    if (touching)
+    {
+      this->SetColor(0x000F | 0x00D0);
+    }
+    else
+    {
+      this->SetColor(GetStoredGetColor());
+    }
+  }
+
 };
+
+#include "UIComponent.cpp"
 
 class TextComponent : public UIComponent
 {
@@ -44,8 +59,9 @@ public:
   std::wstring GetText() const { return text; }
   Alignment GetAlignment() const { return Align; }
   void RenderText(RenderEngine *Renderer, Vector2 *PanelSize = nullptr);
-  void SetText(std::wstring t){text = t;}
-  void AddText(std::wstring t){text = text + t;}
+  void SetText(std::wstring t) { text = t; }
+  void AddText(std::wstring t) { text = text + t; }
+  void HoverOver(float mousex, float mousey, bool clicked, UIComponent* parent = nullptr);
 };
 #include "TextComponent.cpp"
 
@@ -72,13 +88,13 @@ public:
 
   void Settouching(bool b) { touching = b; }
   bool Gettouching() { return touching; }
+  void HoverOver(float mousex, float mousey, bool clicked);
 
   void Update()
   {
-
     if (touching)
     {
-      this->SetColor(0x000F | 0x00D0);
+      this->SetColor(0x000D | 0x00D0);
     }
     else
     {
@@ -100,6 +116,53 @@ public:
   cUISpriteComponent GetUISprite() { return sprite; }
 };
 
+class CheckBoxComponent : public UIComponent
+{
+  bool Checked;
+
+public:
+  CheckBoxComponent(WORD c = 0x000F | 0x0000, bool b = false)
+      : Checked(false), UIComponent(c, Vector2(1, 1), b) {}
+  void RenderCheckBox(RenderEngine *Renderer);
+  void HoverOver(float mousex, float mousey, bool clicked);
+};
+
+#include "CheckBoxComponent.cpp"
+
+class CheckBox : public Object
+{
+  CheckBoxComponent checkbox;
+
+public:
+  explicit CheckBox(Vector2 pos, CheckBoxComponent cx = CheckBoxComponent()) : Object(Transform(pos), L"CheckBox", {"UI"}, {std::make_shared<CheckBoxComponent>(cx)}), checkbox(cx) {}
+  CheckBoxComponent &GetCheckBox() { return checkbox; }
+};
+
+class SliderComponent : public UIComponent
+{
+  Vector2 Start, End;
+  float value;
+
+public:
+  SliderComponent(Vector2 s = Vector2(0, 0), Vector2 e = Vector2(2, 0), WORD c = 0x000F | 0x0000, bool b = false)
+      : Start(s), End(e), UIComponent(c, Vector2(distance(s, e), 1), b) {value = 4;}
+  Vector2 GetEnd(){return End;}
+  void RenderSlider(RenderEngine *Renderer);
+  void HoverOver(float mousex, float mousey, bool clicked);
+};
+
+#include "SliderComponent.cpp"
+
+class Slider : public Object
+{
+  SliderComponent slider;
+
+public:
+  explicit Slider(Vector2 pos, SliderComponent s = SliderComponent()) 
+  : Object(Transform(pos), L"Slider", {"UI"}, {std::make_shared<SliderComponent>(s)}), slider(pos, s.GetEnd(), s.GetColor(), s.Getinteractive()) {}
+  SliderComponent &GetSlider() { return slider; }
+};
+
 class PanelComponent : public UIComponent
 {
 
@@ -108,12 +171,15 @@ public:
 
   void RenderPanel(RenderEngine *Renderer);
   void RenderBackGround(RenderEngine *Renderer);
-  bool HoverOver(float mousex, float mousey, Vector2 pos, Vector2 size);
-  void HandleChildInterAction(int i, RenderEngine *Renderer, float mX, float mY);
-  void InteractWithElement(PanelComponent &p, float mX, float mY);
-  void InteractWithElement(TextComponent &t, float mX, float mY);
-  void InteractWithElement(cUISpriteComponent &c, float mX, float mY);
-  void CheckInteractions(RenderEngine *Renderer, float mX, float mY);
+  //bool HoverOver(float mousex, float mousey, Vector2 pos, Vector2 size);
+  void HandleChildInterAction(int i, RenderEngine *Renderer, float mX, float mY, bool clicked);
+  void InteractWithElement(PanelComponent &p, float mX, float mY, bool clicked);
+  void InteractWithElement(TextComponent &t, float mX, float mY, bool clicked);
+  void InteractWithElement(cUISpriteComponent &c, float mX, float mY, bool clicked);
+  void InteractWithElement(SliderComponent &sl, float mX, float mY, bool clicked);
+  void InteractWithElement(CheckBoxComponent &bx, float mX, float mY, bool clicked);
+
+  void CheckInteractions(RenderEngine *Renderer, float mX, float mY, bool clicked);
   void RenderChildren(int i, RenderEngine *Renderer);
 
 protected:

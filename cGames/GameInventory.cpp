@@ -104,7 +104,7 @@ void SetInventoryPanels()
 
             Vector2 v = Vector2(i * (sizeX + 1) + 14, j * (sizeY + 1) + 2);
 
-            Panel *p = new Panel(v, PanelComponent(Vector2(sizeX, sizeY), 0x000A | 0x00A0, false));
+            Panel *p = new Panel(v, PanelComponent(Vector2(sizeX, sizeY), 0x000A | 0x00A0, true));
             InventoryPanels.push_back(p);
             Inventory->AddChild(p);
         }

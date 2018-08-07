@@ -32,3 +32,63 @@ void TextComponent::RenderText(RenderEngine *Renderer, Vector2 *PanelSize)
         }
     }
 }
+
+void TextComponent::HoverOver(float mousex, float mousey, bool clicked, UIComponent *parent)
+{
+    if (parent == nullptr)
+    {
+        Vector2 p0 = Vector2((this->object->t.GetWorldPosition().x), (this->object->t.GetWorldPosition().y));
+        Vector2 p1 = Vector2((this->object->t.GetWorldPosition().x + this->GetSize().x), (int)(this->object->t.GetWorldPosition().y + this->GetSize().y));
+
+        if (pointInRect(mousex, round((int)mousey), p0, p1))
+        {
+            this->Settouching(true);
+            return;
+        }
+
+        this->Settouching(false);
+    }
+    else
+    {
+        if (this->Align == Alignment::C)
+        {
+
+            Vector2 p0 = Vector2((this->object->t.GetWorldPosition().x + (int)(parent->GetSize().x / 2.0 - (int)this->GetSize().x / 2.0)), (int)(this->object->t.GetWorldPosition().y));
+            Vector2 p1 = Vector2((this->object->t.GetWorldPosition().x + (int)(parent->GetSize().x / 2.0 - (int)this->GetSize().x / 2.0) + (int)this->GetSize().x), (int)(this->object->t.GetWorldPosition().y + this->GetSize().y));
+
+            if (pointInRect(mousex, round((int)mousey), p0, p1))
+            {
+                this->Settouching(true);
+                return;
+            }
+
+            this->Settouching(false);
+        }
+        else if (this->Align == Alignment::L)
+        {
+            Vector2 p0 = Vector2((this->object->t.GetWorldPosition().x), (this->object->t.GetWorldPosition().y));
+            Vector2 p1 = Vector2((this->object->t.GetWorldPosition().x + this->GetSize().x), (int)(this->object->t.GetWorldPosition().y + this->GetSize().y));
+
+            if (pointInRect(mousex, round((int)mousey), p0, p1))
+            {
+                this->Settouching(true);
+                return;
+            }
+
+            this->Settouching(false);
+        }
+        else if (this->Align == Alignment::R)
+        {
+            Vector2 p0 = Vector2((this->object->t.GetWorldPosition().x + (int)(parent->GetSize().x - (int)this->GetSize().x)), (int)(this->object->t.GetWorldPosition().y));
+            Vector2 p1 = Vector2((this->object->t.GetWorldPosition().x + (int)(parent->GetSize().x - (int)this->GetSize().x) + (int)this->GetSize().x), (int)(this->object->t.GetWorldPosition().y + this->GetSize().y));
+
+            if (pointInRect(mousex, round((int)mousey), p0, p1))
+            {
+                this->Settouching(true);
+                return;
+            }
+
+            this->Settouching(false);
+        }
+    }
+}
