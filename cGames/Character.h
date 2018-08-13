@@ -65,17 +65,18 @@ class Character : public Component
 
   std::shared_ptr<Class> *ClassType;
   Gear gearslots[5];
-  std::vector<Item*> Inventory;
+  std::vector<Item *> Inventory;
 
 public:
   std::wstring ClassName;
-  Character(int _s = 1, int _i = 1, int _a = 1, int _st = 1, std::shared_ptr<Class> _ct = std::make_shared<Class>()) 
-  : Strength(_s), Intellect(_i), Agility(_a), Stamina(_st), ClassType(&_ct), ClassName(_ct->GetName()), Inventory(){};
+  
+  explicit Character(int _s = 1, int _i = 1, int _a = 1, int _st = 1, std::shared_ptr<Class> _ct = std::make_shared<Class>())
+      : Strength(_s), Intellect(_i), Agility(_a), Stamina(_st), ClassType(&_ct), ClassName(_ct->GetName()), Inventory(){};
 
-  Item* GetInventoryAt(int i) { return Inventory[i];}
+  Item *GetInventoryAt(int i) { return Inventory[i]; }
 
-  std::vector<Item*> GetInventory() { return Inventory; }
-  void AddToInventory(Item& i)
+  std::vector<Item *> GetInventory() { return Inventory; }
+  void AddToInventory(Item &i)
   {
     if (std::find(this->Inventory.begin(), this->Inventory.end(), &i) == this->Inventory.end())
     {
@@ -85,12 +86,6 @@ public:
   //std::vector<Item> GetInventory(){return Inventory;}
   void SetSelected(Object *s) { this->Selected = s; }
   Object *GetSelected() { return Selected; }
-  ~Character()
-  {
-    delete ClassType;
-    delete Selected;
-    Selected = NULL;
-  }
 
   void Update()
   {
@@ -118,15 +113,20 @@ public:
     }
   }
 
+  int GetHealth() { return Health; }
+  int GetMana() { return Mana; }
+  int GetEnergy() { return Energy; }
+  int GetStrength() { return Strength; }
+  int GetIntellect() { return Intellect; }
+  int GetAgility() { return Agility; }
+  int GetStamina() { return Stamina; }
+  int GetArmour() { return Armour; }
 
-int GetHealth(){return Health;}
-int GetMana(){return Mana;}
-int GetEnergy(){return Energy;}
-int GetStrength(){return Strength;}
-int GetIntellect(){return Intellect;}
-int GetAgility(){return Agility;}
-int GetStamina(){return Stamina;}
-int GetArmour(){return Armour;}
+  ~Character()
+  {
+    delete ClassType;
+    delete Selected;
+  }
 
 private:
 protected:

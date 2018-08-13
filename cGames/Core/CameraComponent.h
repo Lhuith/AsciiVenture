@@ -4,7 +4,7 @@ class CameraComponent : public Component{
     int nScreenHeight;
 
     public:
-        CameraComponent(int w = 1, int h = 1) : nScreenWidth(w), nScreenHeight(h){}  
+        explicit CameraComponent(int w = 1, int h = 1) : nScreenWidth(w), nScreenHeight(h){}  
         inline int GetWidth(){return nScreenWidth;}
         inline int GetHeight(){return nScreenHeight;}
 };

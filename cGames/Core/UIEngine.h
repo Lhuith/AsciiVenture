@@ -8,7 +8,7 @@ class UIEngine
 
     int m_mousePosX;
     int m_mousePosY;
-    bool m_click_0;
+    bool m_click_0, m_click_0_held;
 
     std::vector<Object *> UIElements;
 
@@ -22,15 +22,26 @@ class UIEngine
         GameTextBox->SetRenderer(r);
     };
 
-
     void UpdateUIInput()
     {
         m_mousePosX = Core->m_mousePosX;
         m_mousePosY = Core->m_mousePosY;
 
-        if(Core->GetMouse(0).bPressed){
+        if (Core->GetMouse(0).bHeld)
+        {
+            m_click_0_held = true;
+        }
+        else
+        {
+            m_click_0_held = false;
+        }
+
+        if (Core->GetMouse(0).bPressed)
+        {
             m_click_0 = true;
-        } else {
+        }
+        else
+        {
             m_click_0 = false;
         }
     }
@@ -58,7 +69,7 @@ class UIEngine
     //-------------------------------UI ELEMENTS-------------------------------------/////
     std::vector<Object *> GetUIElements() { return UIElements; }
     Object *GetCanvasAt(int i) { return UIElements.at(0); }
-    
+
     void AddUIElement(Object *c)
     {
         UIElements.push_back(c);
@@ -77,9 +88,22 @@ class UIEngine
 
     void Init() { SetUIElement(); };
 
+    ~UIEngine(){
+        delete DebugTextBox;
+        delete GameTextBox;
+        delete Renderer;
+        delete Core;
+
+        if(UIElements.size() != 0){
+            for(int i = 0; i < UIElements.size(); i++){
+                delete UIElements.at(i);
+            }
+        }
+    }
   protected:
     TextBox *DebugTextBox;
     TextBox *GameTextBox;
+
   private:
 };
 

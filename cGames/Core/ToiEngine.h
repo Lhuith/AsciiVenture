@@ -14,11 +14,8 @@
 //#include "Primitives/Humonoid.h"
 #include "../AsciiArt.h"
 
-
-
 #include "Light.h"
 #include "Scene.h"
-
 
 //#include "Primitives/TestHouse.h"
 
@@ -48,11 +45,11 @@ class ToiEngine
     bool RenderWorld = false;
 
   public:
-    ToiEngine(CoreEngine *ce = new CoreEngine(),
-              RenderEngine *r = new RenderEngine(65, 20)) : Engine(new CoreEngine(ce->GetScenes(), new Camera(CameraComponent(r->GetScreenWidth(), r->GetScreenHeight())), r->GetSTDHConsole())),
-                                                            Renderer(new RenderEngine(r->GetScreenWidth(), r->GetScreenHeight(), &ce->GetSceneAt(0)->objects, ce->GetSceneAt(0))),
-                                                            Physics(new PhysicsEngine(&ce->GetSceneAt(0)->objects)),
-                                                            UI(new UIEngine(new TextBox(24, 1, 20, 5, {L"Game Text"}, 0x0000 | 0x000F), Renderer))
+    explicit ToiEngine(CoreEngine *ce = new CoreEngine(),
+                       RenderEngine *r = new RenderEngine(65, 20)) : Engine(new CoreEngine(ce->GetScenes(), new Camera(CameraComponent(r->GetScreenWidth(), r->GetScreenHeight())), r->GetSTDHConsole())),
+                                                                     Renderer(new RenderEngine(r->GetScreenWidth(), r->GetScreenHeight(), &ce->GetSceneAt(0)->objects, ce->GetSceneAt(0))),
+                                                                     Physics(new PhysicsEngine(&ce->GetSceneAt(0)->objects)),
+                                                                     UI(new UIEngine(new TextBox(24, 1, 20, 5, {L"Game Text"}, 0x0000 | 0x000F), Renderer))
     {
         Physics->SetEngine(Engine);
         Physics->SetUI(UI);
@@ -70,14 +67,13 @@ class ToiEngine
     void EngineUpdate()
     {
         Engine->Update();
-        
+
         if (RenderWorld)
         {
             Renderer->RenderSceneMap();
             Renderer->RenderScene();
         }
 
-   
         Physics->Update();
         UI->GetDebugWindow()->HightLight(Engine->m_mouseScroll, Engine->old_mouseScroll, Engine->m_mousePosX, Engine->m_mousePosY);
         UI->Update();
@@ -92,6 +88,14 @@ class ToiEngine
     inline UIEngine *GetUI() { return UI; }
     inline PhysicsEngine *GetPhysics() { return Physics; }
     inline CoreEngine *GetCoreEngine() { return Engine; }
+
+    ~ToiEngine()
+    {
+        delete Physics;
+        delete Renderer;
+        delete Engine;
+        delete UI;
+    }
 };
 
 enum COLOUR

@@ -1,10 +1,11 @@
+
 void InitInventory()
 {
     RenderEngine *r = Engine->GetRenderer();
 
     Inventory = new Panel(Vector2(0, 0), PanelComponent(Vector2(r->GetScreenWidth(), r->GetScreenHeight()), 0x0000, false));
 
-    InventoryPanels = vector<Panel *>();
+    InventoryPanels = vector<ItemUIPanel *>();
     SetInventoryPanels();
     //Title
     Inventory->AddChild(new Text(Vector2(0, 1), TextComponent(L"ITEMS", 0x0000 | 0x00F0)));
@@ -104,9 +105,11 @@ void SetInventoryPanels()
 
             Vector2 v = Vector2(i * (sizeX + 1) + 14, j * (sizeY + 1) + 2);
 
-            Panel *p = new Panel(v, PanelComponent(Vector2(sizeX, sizeY), 0x000A | 0x00A0, true));
+            ItemUIPanel *p = new ItemUIPanel(v, Vector2(sizeX, sizeY), new Item());
+
             InventoryPanels.push_back(p);
             Inventory->AddChild(p);
+            p->SetActive(false);
         }
 }
 
@@ -128,8 +131,26 @@ void UpdateInventoryPanels()
                 {
                     Item *item = Player->GetComponent<Character>()->GetInventoryAt(index);
 
-                    InventoryPanels.at(index)->AddChild(new CUISprite(Vector2(0, 0), cUISpriteComponent(item->getUISprite()->GetM(),
-                                                                                                        item->getUISprite()->GetSize(), Vector2(1, 1), item->getUISprite()->GetColor())));
+                    InventoryPanels.at(index)->SetActive(true);
+
+                    InventoryPanels.at(index)->SetItem(item);
+                    InventoryPanels.at(index)->SetSprite(*item->getUISprite());
+                    InventoryPanels.at(index)->GetSprite().Setinteractive(true);
+                }
+            }
+
+            if (InventoryPanels.at(0)->isActive)
+            {
+                if (InventoryPanels.at(index)->GetComponent<ItemUIComponent>() != nullptr)
+                {
+                    if (InventoryPanels.at(index)->GetComponent<PanelComponent>()->Gettouching())
+                    {
+                        if (Engine->GetCoreEngine()->GetMouse(1).bPressed)
+                        {
+                            //InventoryPanels.erase(remove(InventoryPanels.begin(), InventoryPanels.end(), InventoryPanels.at(0)), InventoryPanels.end());
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -139,8 +160,8 @@ void HandleToolTip()
 {
     ToolTip->SetActive(false);
     bool isTouching = false;
-    Object *object = nullptr;
     wstring text = L"poopoo";
+    WORD color = 0x000F;
 
     for (int i = 0; i < Engine->GetUI()->GetUIElements().size(); i++)
     {
@@ -148,8 +169,7 @@ void HandleToolTip()
         {
             if (Engine->GetUI()->GetUIElements().at(i)->GetComponent<PanelComponent>() != nullptr)
             {
-                isTouching = IsUITouching(Engine->GetUI()->GetUIElements().at(i), text);
-
+                isTouching = IsUITouching(Engine->GetUI()->GetUIElements().at(i), *ToolTip);
                 if (isTouching)
                     break;
             }
@@ -159,23 +179,58 @@ void HandleToolTip()
     if (isTouching)
     {
         ToolTip->SetActive(true);
-        ToolTip->GetChildAt(0)->GetComponent<TextComponent>()->SetText(text);
     }
     else
     {
         ToolTip->SetActive(false);
-        ToolTip->GetChildAt(0)->GetComponent<TextComponent>()->SetText(L"Poo");
     }
 }
 
-bool IsUITouching(Object *o, wstring &text)
+WORD RareToColor(Item::ITEMRARITY r)
+{
+
+    if (r == Item::ITEMRARITY::COMMON || r == Item::ITEMRARITY::ZILCH || r == Item::ITEMRARITY::MISC)
+    {
+        return 0x000F | 0x0000;
+    }
+    else if (r == Item::ITEMRARITY::UNCOMMON)
+    {
+        return 0x000A | 0x0000;
+    }
+    else if (r == Item::ITEMRARITY::RARE)
+    {
+        return 0x000B | 0x0000;
+    }
+    else if (r == Item::ITEMRARITY::LEGENDARY)
+    {
+        return 0x000D | 0x0000;
+    }
+    else if (r == Item::ITEMRARITY::UBER)
+    {
+        return 0x000E | 0x0000;
+    }
+    else if (r == Item::ITEMRARITY::ARTIFACT)
+    {
+        return 0x000C | 0x0000;
+    }
+
+    return 0x000F | 0x0000;
+}
+
+bool IsUITouching(Object *o, Panel &toolTip)
 {
     if (o->GetComponent<PanelComponent>() != nullptr)
     {
         if (o->GetComponent<PanelComponent>()->Gettouching())
         {
-            text = o->GetName();
-            return true;
+            if (o->GetComponent<ItemUIComponent>() != nullptr)
+            {
+                //Set Name and color to rarity
+                toolTip.GetChildAt(0)->GetComponent<TextComponent>()->SetText(o->GetComponent<ItemUIComponent>()->GetItem().GetName());
+                toolTip.GetChildAt(0)->GetComponent<TextComponent>()->SetColor(RareToColor((o->GetComponent<ItemUIComponent>()->GetItem().GetRarity())));
+
+                return true;
+            }
         }
     }
 
@@ -183,29 +238,39 @@ bool IsUITouching(Object *o, wstring &text)
     {
         for (int j = 0; j < o->GetChildren().size(); j++)
         {
-            if (o->GetChildAt(j)->GetComponent<PanelComponent>() != nullptr)
+            if (o->GetChildAt(j)->isActive)
             {
-
-                if (IsUITouching(o->GetChildAt(j), text))
-                    return true;
-
-            }
-
-            if (o->GetChildAt(j)->GetComponent<TextComponent>() != nullptr)
-            {
-                if (o->GetChildAt(j)->GetComponent<TextComponent>()->Gettouching())
+                if (o->GetChildAt(j)->GetComponent<PanelComponent>() != nullptr)
                 {
-                    text = o->GetChildAt(j)->GetComponent<TextComponent>()->GetText();
-                    return true;
+                    if (IsUITouching(o->GetChildAt(j), toolTip))
+                        return true;
                 }
-            }
 
-            if (o->GetChildAt(j)->GetComponent<cUISpriteComponent>() != nullptr)
-            {
-                if (o->GetChildAt(j)->GetComponent<cUISpriteComponent>()->Gettouching())
+                if (o->GetChildAt(j)->GetComponent<TextComponent>() != nullptr)
                 {
-                    text = o->GetChildAt(j)->GetComponent<cUISpriteComponent>()->object->GetName();
-                    return true;
+                    if (o->GetChildAt(j)->GetComponent<TextComponent>()->Gettouching())
+                    {
+                        toolTip.GetChildAt(0)->GetComponent<TextComponent>()->SetText(o->GetChildAt(j)->GetComponent<TextComponent>()->GetText());
+                        return true;
+                    }
+                }
+
+                if (o->GetChildAt(j)->GetComponent<cUISpriteComponent>() != nullptr)
+                {
+                    if (o->GetChildAt(j)->GetComponent<cUISpriteComponent>()->Gettouching())
+                    {
+                        toolTip.GetChildAt(0)->GetComponent<TextComponent>()->SetText(o->GetChildAt(j)->GetComponent<cUISpriteComponent>()->object->GetName());
+                        return true;
+                    }
+                }
+
+                if (o->GetChildAt(j)->GetComponent<cUISpriteComponent>() != nullptr)
+                {
+                    if (o->GetChildAt(j)->GetComponent<cUISpriteComponent>()->Gettouching())
+                    {
+                        toolTip.GetChildAt(0)->GetComponent<TextComponent>()->SetText(o->GetChildAt(j)->GetComponent<cUISpriteComponent>()->object->GetName());
+                        return true;
+                    }
                 }
             }
         }

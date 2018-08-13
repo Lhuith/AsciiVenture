@@ -8,9 +8,10 @@ class CoreEngine
     } m_keys[256], m_mouse[5];
 
     Camera *MainCamera;
-    HANDLE m_hConsoleInPTR;
     std::vector<Scene *> Scenes;
 
+        HANDLE m_hConsoleInPTR;
+        
   public:
     std::vector<std::string> FLAGS{
         "Player",
@@ -74,7 +75,7 @@ class CoreEngine
     {
         tp1 = std::chrono::system_clock::now();
         tp2 = std::chrono::system_clock::now();
-        
+
         if (Scenes.size() != 0)
         {
             for (int i = 0; i < Scenes.size(); i++)
@@ -82,7 +83,6 @@ class CoreEngine
                 Scenes.at(i)->Init();
             }
         }
-
     };
     void ProcessInput();
 
@@ -93,6 +93,19 @@ class CoreEngine
     sKeyState GetKey(int nKeyID) { return m_keys[nKeyID]; }
     sKeyState GetMouse(int nMouseButtonID) { return m_mouse[nMouseButtonID]; }
     inline std::vector<Scene *> GetScenes() { return Scenes; }
+
+    ~CoreEngine()
+    {
+        delete MainCamera;
+
+        if (Scenes.size() != 0)
+        {
+            for (int i = 0; i < Scenes.size(); i++)
+            {
+                delete Scenes.at(i);
+            }
+        }
+    }
 
   protected:
     short m_keyOldState[256] = {0};

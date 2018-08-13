@@ -43,7 +43,10 @@ struct TextBox {
         inline int GetScreenPosY() const {return posY + Renderer->GetScreenHeight();}
 
         bool HoverOver(float x, float y);
-
+        
+        ~TextBox(){
+            delete Renderer;
+        }
     protected:
         RenderEngine *Renderer;
         std::vector<LogInfo> logs;

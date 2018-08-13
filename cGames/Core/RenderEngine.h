@@ -70,6 +70,15 @@ class RenderEngine
         delete[] screenBuffer; 
         delete[] GameInformation; 
         delete Engine;
+
+        delete scene;
+
+        if(lights.size() != 0){
+            for(int i = 0; i < lights.size(); i++){
+                delete lights.at(i);
+            }
+        }
+
         SetConsoleActiveScreenBuffer(m_hOriginalConsole);
         }
     

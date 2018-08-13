@@ -51,7 +51,7 @@ void Object::SetChildActive(bool b)
     {
         for (int i = 0; i < children.size(); i++)
         {
-            children.at(i)->SetActive(b);
+            //children.at(i)->SetActive(b);
         }
     }
 }

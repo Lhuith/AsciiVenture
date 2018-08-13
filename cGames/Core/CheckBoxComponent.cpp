@@ -35,7 +35,7 @@ void CheckBoxComponent::RenderCheckBox(RenderEngine *Renderer)
     }
 }
 
-void CheckBoxComponent::HoverOver(float mousex, float mousey, bool clicked)
+void CheckBoxComponent::HoverOver(float mousex, float mousey, bool clicked, bool held)
 {
     Vector2 p0 = Vector2((this->object->t.GetWorldPosition().x), (this->object->t.GetWorldPosition().y));
     Vector2 p1 = Vector2((this->object->t.GetWorldPosition().x + this->GetSize().x), (this->object->t.GetWorldPosition().y + this->GetSize().y));

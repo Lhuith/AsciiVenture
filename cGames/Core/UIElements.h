@@ -20,7 +20,7 @@ public:
 
   void Settouching(bool b) { touching = b; }
   bool Gettouching() { return touching; }
-  virtual void HoverOver(float mousex, float mousey, bool clicked);
+  virtual void HoverOver(float mousex, float mousey, bool clicked, bool held);
   void OverrideColor(WORD c)
   {
     this->color = c;
@@ -29,14 +29,6 @@ public:
 
   void Update()
   {
-    if (touching)
-    {
-      this->SetColor(0x000F | 0x00D0);
-    }
-    else
-    {
-      this->SetColor(GetStoredGetColor());
-    }
   }
 
 };
@@ -61,7 +53,7 @@ public:
   void RenderText(RenderEngine *Renderer, Vector2 *PanelSize = nullptr);
   void SetText(std::wstring t) { text = t; }
   void AddText(std::wstring t) { text = text + t; }
-  void HoverOver(float mousex, float mousey, bool clicked, UIComponent* parent = nullptr);
+  void HoverOver(float mousex, float mousey, bool clicked, bool held, UIComponent* parent = nullptr);
 };
 #include "TextComponent.cpp"
 
@@ -88,18 +80,10 @@ public:
 
   void Settouching(bool b) { touching = b; }
   bool Gettouching() { return touching; }
-  void HoverOver(float mousex, float mousey, bool clicked);
+  void HoverOver(float mousex, float mousey, bool clicked, bool held);
 
   void Update()
   {
-    if (touching)
-    {
-      this->SetColor(0x000D | 0x00D0);
-    }
-    else
-    {
-      this->SetColor(GetStoredColor());
-    }
   }
 };
 
@@ -124,7 +108,8 @@ public:
   CheckBoxComponent(WORD c = 0x000F | 0x0000, bool b = false)
       : Checked(false), UIComponent(c, Vector2(1, 1), b) {}
   void RenderCheckBox(RenderEngine *Renderer);
-  void HoverOver(float mousex, float mousey, bool clicked);
+  void HoverOver(float mousex, float mousey, bool clicked, bool held);
+  bool GetIfChecked(){return Checked;}
 };
 
 #include "CheckBoxComponent.cpp"
@@ -148,7 +133,7 @@ public:
       : Start(s), End(e), UIComponent(c, Vector2(distance(s, e), 1), b) {value = 4;}
   Vector2 GetEnd(){return End;}
   void RenderSlider(RenderEngine *Renderer);
-  void HoverOver(float mousex, float mousey, bool clicked);
+  void HoverOver(float mousex, float mousey, bool clicked, bool held);
 };
 
 #include "SliderComponent.cpp"
@@ -172,14 +157,14 @@ public:
   void RenderPanel(RenderEngine *Renderer);
   void RenderBackGround(RenderEngine *Renderer);
   //bool HoverOver(float mousex, float mousey, Vector2 pos, Vector2 size);
-  void HandleChildInterAction(int i, RenderEngine *Renderer, float mX, float mY, bool clicked);
-  void InteractWithElement(PanelComponent &p, float mX, float mY, bool clicked);
-  void InteractWithElement(TextComponent &t, float mX, float mY, bool clicked);
-  void InteractWithElement(cUISpriteComponent &c, float mX, float mY, bool clicked);
-  void InteractWithElement(SliderComponent &sl, float mX, float mY, bool clicked);
-  void InteractWithElement(CheckBoxComponent &bx, float mX, float mY, bool clicked);
+  void HandleChildInterAction(int i, RenderEngine *Renderer, float mX, float mY, bool clicked, bool held);
+  void InteractWithElement(PanelComponent &p, float mX, float mY, bool clicked, bool held);
+  void InteractWithElement(TextComponent &t, float mX, float mY, bool clicked, bool held);
+  void InteractWithElement(cUISpriteComponent &c, float mX, float mY, bool clicked, bool held);
+  void InteractWithElement(SliderComponent &sl, float mX, float mY, bool clicked, bool held);
+  void InteractWithElement(CheckBoxComponent &bx, float mX, float mY, bool clicked, bool held);
+  void CheckInteractions(RenderEngine *Renderer, float mX, float mY, bool clicked, bool held);
 
-  void CheckInteractions(RenderEngine *Renderer, float mX, float mY, bool clicked);
   void RenderChildren(int i, RenderEngine *Renderer);
 
 protected:
@@ -189,8 +174,8 @@ protected:
 class Panel : public Object
 {
   PanelComponent panel;
-
 public:
-  explicit Panel(Vector2 pos, PanelComponent t = PanelComponent()) : Object(Transform(pos), L"Panel", {"UI"}, {std::make_shared<PanelComponent>(t)}), panel(t) {}
+  explicit Panel(Vector2 pos, PanelComponent p = PanelComponent()) : 
+  Object(Transform(pos), L"Panel", {"UI"}, {std::make_shared<PanelComponent>(p)}), panel(p) {};
   PanelComponent &GetPanel() { return panel; }
 };

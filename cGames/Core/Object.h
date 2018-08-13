@@ -23,6 +23,9 @@ class Object
     std::shared_ptr<T> AddComponent();
     template <typename T>
     std::shared_ptr<T> GetComponent();
+    template <typename T>
+    std::shared_ptr<T> GetComponentAt(int i);
+
     inline void SetTag(std::string str)
     {
         if (find(this->tags.begin(), this->tags.end(), str) == this->tags.end())
@@ -37,6 +40,7 @@ class Object
     void SetChildren();
     void SetChild(int i);
     void SetChild(Object *o);
+    
     std::vector<Object *> GetChildren() { return children; }
     Object *GetChildAt(int i) { return children.at(i); }
     
@@ -76,6 +80,12 @@ class Object
     {
         delete Parent;
         delete local;
+
+        if(children.size() != 0){
+            for(int i = 0; i < children.size(); i++){
+                delete children.at(i);
+            }
+        }
     }
 
   private:
@@ -99,6 +109,19 @@ std::shared_ptr<T> Object::GetComponent()
 
     return nullptr;
 }
+
+template <typename T>
+std::shared_ptr<T> Object::GetComponentAt(int i)
+{
+
+        if (std::dynamic_pointer_cast<T>(components[i]))
+        {
+            return std::dynamic_pointer_cast<T>(components[i]);
+        }
+
+    return nullptr;
+}
+
 
 template <typename T>
 std::shared_ptr<T> Object::AddComponent()

@@ -15,6 +15,47 @@
 
 using namespace std;
 
+class ItemUIComponent : public Component
+{
+
+    Item *item;
+
+  public:
+    ItemUIComponent(Item *i) : item(i) {}
+
+    Item GetItem() { return *item; }
+    void SetItem(Item *i) { this->item = i; };
+};
+
+class ItemUIPanel : public Object
+{
+
+  public:
+    explicit ItemUIPanel(Vector2 pos, Vector2 s, Item *i = new Item()) : Object(Transform(pos), L"UIPanel", {"UI"}, {
+                                                                                                                        std::make_shared<PanelComponent>(PanelComponent(s, 0x000F | 0x0000, true)),
+                                                                                                                        std::make_shared<cUISpriteComponent>(cUISpriteComponent()),
+                                                                                                                        std::make_shared<ItemUIComponent>(ItemUIComponent(i)),
+                                                                                                                    }){};
+
+    cUISpriteComponent &GetSprite() { return *this->GetComponent<cUISpriteComponent>(); }
+    void SetSprite(cSprite s)
+    {
+        this->GetComponent<cUISpriteComponent>()->SetM(s.GetM());
+        this->GetComponent<cUISpriteComponent>()->SetSize(s.GetSize());
+        this->GetComponent<cUISpriteComponent>()->SetColor(s.GetColor());
+    };
+
+    Item GetItem() { return this->GetComponent<ItemUIComponent>()->GetItem(); }
+    void SetItem(Item *i)
+    {
+        this->GetComponent<ItemUIComponent>()->SetItem(i);
+        SetSprite(*i->getUISprite());
+    };
+
+    PanelComponent &GetPanel() { return *this->GetComponentAt<PanelComponent>(0); }
+    void SetPanel(PanelComponent p) { GetPanel() = p; }
+};
+
 struct Direction
 {
     bool LEFT;
@@ -49,7 +90,8 @@ Panel *Menu;
 Panel *Inventory;
 Panel *StatPanel;
 Panel *ToolTip;
-std::vector<Panel *> InventoryPanels;
+
+std::vector<ItemUIPanel *> InventoryPanels;
 
 float fPlayerX = 32;
 float fPlayerY = 9;
@@ -58,12 +100,11 @@ float fPlayerA = 0.0f;
 Object *testLight;
 Object *testLight2;
 
-bool Interacting, l_mButton, ShowText, ShowDebug;
-
 Scene *currentLevel;
 
 Object *Player;
 Character PlayerInformation;
+Vector2 *tPos;
 
 enum GameStates
 {
@@ -87,13 +128,14 @@ void InitInventory();
 void UpdateInventoryPanels();
 void SetInventoryPanels();
 void HandleToolTip();
-bool IsUITouching(Object *o, wstring& text);
+bool IsUITouching(Object *o, Panel &toolTip);
+void ManageToolTip();
+WORD RareToColor(Item::ITEMRARITY r);
 
 float OldTime, currentTime, duration = 1.0;
 
-//CoreEngine* Engine;
 ToiEngine *Engine;
-//Object* CameraWorldPos;
+
 int main()
 {
     CurrentState = PLAY;
@@ -129,18 +171,11 @@ int main()
 
     while (1)
     {
-
-        if (ToolTip->t.GetPos().y + ToolTip->GetPanel().GetSize().y < Engine->GetRenderer()->GetScreenHeight())
-        {
-            ToolTip->t.SetWorldTransform(new Vector2(Engine->GetCoreEngine()->m_mousePosX + ToolTip->GetPanel().GetSize().x / 2.0,
-                                                     Engine->GetCoreEngine()->m_mousePosY - ToolTip->GetPanel().GetSize().y));
-        }
-
         currentTime = Engine->GetCoreEngine()->Time - OldTime;
         int size = 0;
 
+        ManageToolTip();
         UpdateInventoryPanels();
-
         Engine->EngineUpdate();
         Input();
 
@@ -163,8 +198,8 @@ int main()
 
             Menu->SetActive(false);
             Inventory->SetActive(false);
-            ToolTip->SetActive(false);
-            //HandleToolTip();
+
+            Debug((int)InventoryPanels.size());
         }
 
         if (CurrentState == INVENTORY)
@@ -194,6 +229,9 @@ int main()
     delete Menu;
     delete Inventory;
     delete Engine;
+    delete ToolTip;
+    delete tPos;
+
     return 0;
 }
 
@@ -234,6 +272,23 @@ void Debug(Vector2 v)
 void AssignLevel(Scene *Scene)
 {
     currentLevel = Scene;
+}
+
+void ManageToolTip()
+{
+    tPos = new Vector2(Engine->GetCoreEngine()->m_mousePosX + 3, Engine->GetCoreEngine()->m_mousePosY);
+
+    if (tPos->x + ToolTip->GetPanel().GetSize().x > Engine->GetRenderer()->GetScreenWidth())
+    {
+        tPos = new Vector2(Engine->GetRenderer()->GetScreenWidth() - ToolTip->GetPanel().GetSize().x, tPos->y);
+    }
+
+    if (tPos->y + ToolTip->GetPanel().GetSize().y + 1 > Engine->GetRenderer()->GetScreenHeight())
+    {
+        tPos = new Vector2(tPos->x, Engine->GetRenderer()->GetScreenHeight() - ToolTip->GetPanel().GetSize().y - 1);
+    }
+
+    ToolTip->t.SetWorldTransform(tPos);
 }
 
 void Input()

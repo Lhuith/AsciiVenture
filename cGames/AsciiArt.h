@@ -53,6 +53,9 @@ namespace Models {
         std::wstring head_00(L"   "
                               "█▀█"
                               "   ");
+         std::wstring boots_00(L"   "
+                                " █ "
+                                "▀▀ ");
 
     }
 
@@ -66,5 +69,7 @@ namespace Models {
                                "▌▐");
 
         std::wstring head_00(L"∩");
+
+        std::wstring boots_00(L"╝ ╚");
     }
 }

@@ -43,7 +43,7 @@ void SliderComponent::RenderSlider(RenderEngine *Renderer)
     }
 }
 
-void SliderComponent::HoverOver(float mousex, float mousey, bool clicked)
+void SliderComponent::HoverOver(float mousex, float mousey, bool clicked, bool held)
 {
     Vector2 p0 = Vector2((this->object->t.GetWorldPosition().x), (this->object->t.GetWorldPosition().y));
     Vector2 p1 = Vector2((this->object->t.GetWorldPosition().x + this->GetSize().x), (this->object->t.GetWorldPosition().y + this->GetSize().y));
@@ -52,7 +52,7 @@ void SliderComponent::HoverOver(float mousex, float mousey, bool clicked)
     {
         this->Settouching(true);
 
-        if (clicked)
+        if (held)
         {
             value = (mousex) - 2;
         }

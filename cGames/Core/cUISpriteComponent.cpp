@@ -26,7 +26,7 @@ void cUISpriteComponent::RendercSprite(RenderEngine *Renderer)
         }
 }
 
-void cUISpriteComponent::HoverOver(float mousex, float mousey, bool clicked)
+void cUISpriteComponent::HoverOver(float mousex, float mousey, bool clicked, bool held)
 {
     Vector2 p0 = Vector2((this->object->t.GetWorldPosition().x), (this->object->t.GetWorldPosition().y));
     Vector2 p1 = Vector2((this->object->t.GetWorldPosition().x + this->GetSize().x), (this->object->t.GetWorldPosition().y + this->GetSize().y));
@@ -37,7 +37,6 @@ void cUISpriteComponent::HoverOver(float mousex, float mousey, bool clicked)
         this->SetColor(0x000F | 0x00D0);
         return;
     }
-
 
     this->Settouching(false);
     this->SetColor(GetStoredColor());

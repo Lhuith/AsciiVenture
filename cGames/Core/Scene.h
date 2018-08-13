@@ -9,6 +9,7 @@ class Scene {
 	CHAR_INFO* attributes;
 	//RenderEngine* Renderer;
 	Vector2* WorldTransform;
+
 	public:
 		std::vector<Object*> objects;
 		explicit Scene(std::wstring _n = L" ", std::wstring _m = L"?", 
@@ -20,11 +21,12 @@ class Scene {
 		~Scene()
 		{
 			delete[] attributes;
+			delete WorldTransform;
+
 			// Free the memory from all the pointers
 			for (int i = 0; i < objects.size(); i++)
 			{
-				Object *o = objects[i];
-				delete o;
+				delete objects.at(i);
 			}
 		}
 

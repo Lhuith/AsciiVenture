@@ -6,7 +6,7 @@ class Collider : public Component{
         std::vector<Object*> *collisions; //refrence to collisions;
         std::vector<Object*> *OnExit;
 
-        Collider(std::vector<Object*> *c = new std::vector<Object*>, std::vector<Object*> *e = new std::vector<Object*>)
+        explicit Collider(std::vector<Object*> *c = new std::vector<Object*>, std::vector<Object*> *e = new std::vector<Object*>)
         : collisions(c), OnExit(e){};
         bool isColliding, isTriggered, Trigger; //if is trigger, dont apply forces and shit
         //bool SetColliding(bool c){isColliding = c;};
@@ -23,7 +23,11 @@ class Collider : public Component{
         void CleanUp();
         void RemoveFromCleanUp(Object *o);
         void AddToCleanUpCrew(Object *o);
-
+        
+        ~Collider(){
+            //delete collisions;
+            //delete OnExit;
+        }
     protected:
 
     private:

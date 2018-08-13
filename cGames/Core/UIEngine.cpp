@@ -48,7 +48,7 @@ void UIEngine::UpdateUIElemnts()
 
             if (UIElements.at(i)->GetComponent<PanelComponent>() != nullptr)
             {
-                UIElements.at(i)->GetComponent<PanelComponent>()->CheckInteractions(Renderer, round(m_mousePosX), round(m_mousePosY), m_click_0);
+                UIElements.at(i)->GetComponent<PanelComponent>()->CheckInteractions(Renderer, round(m_mousePosX), round(m_mousePosY), m_click_0, m_click_0_held);
             }
         }
     }

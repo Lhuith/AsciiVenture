@@ -1,49 +1,64 @@
-class Item : public Component {
+class Item : public Component
+{
     int index;
     cUISpriteComponent *UISprite;
-    protected:
-        int power;
-    enum ITEMTYPE{
+    std::wstring name;
+
+  protected:
+    int power;
+
+  public:
+    enum ITEMTYPE
+    {
         DEFUALT,
         GEAR,
         WEAPON,
         CONSUMABLE,
         QUEST,
+        EMPTY,
     } Type;
-    
-    enum ITEMRARITY{
+
+    enum ITEMRARITY
+    {
+        ZILCH,
         MISC,
         UNCOMMON,
         COMMON,
         RARE,
         UBER,
-        LEGENDARY
+        LEGENDARY,
+        ARTIFACT,
     } Quality;
 
-    
-    public:
-        Item(int _i = 999, cUISpriteComponent* _gUIS = new cUISpriteComponent(), cUISpriteComponent* _gWS = new cUISpriteComponent(), ITEMTYPE t = ITEMTYPE::DEFUALT, ITEMRARITY r = ITEMRARITY::MISC) 
-        : index(_i), UISprite(_gUIS), Quality(r), Type(t){}
-        
-        inline cUISpriteComponent* getUISprite() const {return UISprite;}
-        ~Item(){delete UISprite;}
+    explicit Item(int _i = 999, cUISpriteComponent *_gUIS = new cUISpriteComponent(), ITEMTYPE t = ITEMTYPE::EMPTY, ITEMRARITY r = ITEMRARITY::ZILCH, std::wstring n = L"")
+        : index(_i), UISprite(_gUIS), Quality(r), Type(t), name(n) {}
+
+    inline cUISpriteComponent *getUISprite() const { return UISprite; }
+    ~Item() { delete UISprite; }
+
+    std::wstring GetName() { return name; }
+    ITEMRARITY GetRarity() { return Quality; }
+    ITEMTYPE GetType() { return Type; }
 };
 
-class Consumable : public Item {
+class Consumable : public Item
+{
 
-    public:
-        Consumable(int _i = 999, cUISpriteComponent* _gUIS = new cUISpriteComponent(), cUISpriteComponent* _gWS = new cUISpriteComponent()) 
-        : Item(_i, _gUIS, _gWS, Item::CONSUMABLE){}
-        //int Use(){return power;}
+  public:
+    explicit Consumable(int _i = 999, cUISpriteComponent *_gUIS = new cUISpriteComponent(), std::wstring n = L"")
+        : Item(_i, _gUIS, Item::CONSUMABLE, Item::ITEMRARITY::MISC, n) {}
+    //int Use(){return power;}
 };
 
-class Gear : public Item {
+class Gear : public Item
+{
 
     int Armour;
-    protected:
 
-    public:
-    enum GEARTYPE {
+  protected:
+  public:
+    enum GEARTYPE
+    {
         CLOTH,
         LEATHER,
         MAIL,
@@ -51,7 +66,8 @@ class Gear : public Item {
         SHIELD
     } GearType;
 
-    enum GEARSLOT {
+    enum GEARSLOT
+    {
         CHEST,
         PANTS,
         GLOVES,
@@ -60,69 +76,71 @@ class Gear : public Item {
         OFFHAND
     } GearSlot;
 
-
-    Gear(GEARTYPE _gt = GEARTYPE::CLOTH, GEARSLOT _gs = GEARSLOT::CHEST, int _a = 1, int _i = 999, cUISpriteComponent* _gUIS = new cUISpriteComponent(), cUISpriteComponent* _gWS = new cUISpriteComponent())
-         : GearType(_gt), GearSlot(_gs), Armour(_a), Item(_i, _gUIS, _gWS, Item::GEAR){}
-        //int Use(){return power;}
+    explicit Gear(GEARTYPE _gt = GEARTYPE::CLOTH, GEARSLOT _gs = GEARSLOT::CHEST, Item::ITEMRARITY rare = Item::ITEMRARITY::COMMON, int _a = 1, int _i = 999, cUISpriteComponent *_gUIS = new cUISpriteComponent(), std::wstring n = L"")
+        : GearType(_gt), GearSlot(_gs), Armour(_a), Item(_i, _gUIS, Item::GEAR, rare, n) {}
+    //int Use(){return power;}
 };
 
-class Chest: public Gear{
+class Chest : public Gear
+{
 
-    public:
-      Chest(Gear::GEARTYPE _gt = GEARTYPE::CLOTH, int _a = 1, int _i = 999, cUISpriteComponent* _gUIS = new cUISpriteComponent(), cUISpriteComponent* _gWS = new cUISpriteComponent())
-         : Gear(_gt, GEARSLOT::CHEST,_a, _i, _gUIS, _gWS){}
-
+  public:
+    explicit Chest(Gear::GEARTYPE _gt = GEARTYPE::CLOTH, Item::ITEMRARITY rare = Item::ITEMRARITY::COMMON, int _a = 1, int _i = 999, cUISpriteComponent *_gUIS = new cUISpriteComponent(), std::wstring n = L"")
+        : Gear(_gt, GEARSLOT::CHEST, rare, _a, _i, _gUIS, n) {}
 };
 
-class Pants: public Gear{
+class Pants : public Gear
+{
 
-    public:
-     Pants(Gear::GEARTYPE _gt = GEARTYPE::CLOTH, int _a = 1, int _i = 999, cUISpriteComponent* _gUIS = new cUISpriteComponent(), cUISpriteComponent* _gWS = new cUISpriteComponent())
-         : Gear(_gt, GEARSLOT::PANTS,_a, _i, _gUIS, _gWS){}
-
+  public:
+    explicit Pants(Gear::GEARTYPE _gt = GEARTYPE::CLOTH, Item::ITEMRARITY rare = Item::ITEMRARITY::COMMON, int _a = 1, int _i = 999, cUISpriteComponent *_gUIS = new cUISpriteComponent(), std::wstring n = L"")
+        : Gear(_gt, GEARSLOT::PANTS, rare, _a, _i, _gUIS, n) {}
 };
 
-class Gloves: public Gear{
+class Gloves : public Gear
+{
 
-    public:
-        Gloves(Gear::GEARTYPE _gt = GEARTYPE::CLOTH, int _a = 1, int _i = 999, cUISpriteComponent* _gUIS = new cUISpriteComponent(), cUISpriteComponent* _gWS = new cUISpriteComponent())
-         : Gear(_gt, GEARSLOT::GLOVES,_a, _i, _gUIS, _gWS){}
-
+  public:
+    explicit Gloves(Gear::GEARTYPE _gt = GEARTYPE::CLOTH, Item::ITEMRARITY rare = Item::ITEMRARITY::COMMON, int _a = 1, int _i = 999, cUISpriteComponent *_gUIS = new cUISpriteComponent(), std::wstring n = L"")
+        : Gear(_gt, GEARSLOT::GLOVES, rare, _a, _i, _gUIS, n) {}
 };
 
-class Head: public Gear{
+class Head : public Gear
+{
 
-    public:
-        Head(Gear::GEARTYPE _gt = GEARTYPE::CLOTH, int _a = 1, int _i = 999, cUISpriteComponent* _gUIS = new cUISpriteComponent(), cUISpriteComponent* _gWS = new cUISpriteComponent())
-         : Gear(_gt, GEARSLOT::HEAD,_a, _i, _gUIS, _gWS){}
-
+  public:
+    explicit Head(Gear::GEARTYPE _gt = GEARTYPE::CLOTH, Item::ITEMRARITY rare = Item::ITEMRARITY::COMMON, int _a = 1, int _i = 999, cUISpriteComponent *_gUIS = new cUISpriteComponent(), std::wstring n = L"")
+        : Gear(_gt, GEARSLOT::HEAD, rare, _a, _i, _gUIS, n) {}
 };
 
-class Boots: public Gear{
+class Boots : public Gear
+{
 
-    public:
-        Boots(Gear::GEARTYPE _gt = GEARTYPE::CLOTH, int _a = 1, int _i = 999, cUISpriteComponent* _gUIS = new cUISpriteComponent(), cUISpriteComponent* _gWS = new cUISpriteComponent())
-         : Gear(_gt, GEARSLOT::BOOTS,_a, _i, _gUIS, _gWS){}
-
+  public:
+    explicit Boots(Gear::GEARTYPE _gt = GEARTYPE::CLOTH, Item::ITEMRARITY rare = Item::ITEMRARITY::COMMON, int _a = 1, int _i = 999, cUISpriteComponent *_gUIS = new cUISpriteComponent(), std::wstring n = L"")
+        : Gear(_gt, GEARSLOT::BOOTS, rare, _a, _i, _gUIS, n) {}
 };
 
-class Shield: public Gear{
+class Shield : public Gear
+{
 
-    public:
-        Shield(Gear::GEARTYPE _gt = GEARTYPE::SHIELD, int _a = 1, int _i = 999, cUISpriteComponent* _gUIS = new cUISpriteComponent(), cUISpriteComponent* _gWS = new cUISpriteComponent())
-         : Gear(_gt, GEARSLOT::OFFHAND,_a, _i, _gUIS, _gWS){}
-}; 
+  public:
+   explicit Shield(Gear::GEARTYPE _gt = GEARTYPE::SHIELD, Item::ITEMRARITY rare = Item::ITEMRARITY::COMMON, int _a = 1, int _i = 999, cUISpriteComponent *_gUIS = new cUISpriteComponent(), std::wstring n = L"")
+        : Gear(_gt, GEARSLOT::OFFHAND, rare, _a, _i, _gUIS, n) {}
+};
 
-class Weapon : public Item {
+class Weapon : public Item
+{
 
-    enum WEAPONTYPE{
+    enum WEAPONTYPE
+    {
         AXE,
         SWORD,
         BOW,
         STAFF,
     } WeaponType;
 
-    public:
-        //int Use(){return power;}
-        //void Equip(){}
+  public:
+    //int Use(){return power;}
+    //void Equip(){}
 };

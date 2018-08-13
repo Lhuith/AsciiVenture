@@ -33,7 +33,7 @@ void TextComponent::RenderText(RenderEngine *Renderer, Vector2 *PanelSize)
     }
 }
 
-void TextComponent::HoverOver(float mousex, float mousey, bool clicked, UIComponent *parent)
+void TextComponent::HoverOver(float mousex, float mousey, bool clicked, bool held, UIComponent *parent)
 {
     if (parent == nullptr)
     {
