@@ -6,6 +6,10 @@ void InitInventory()
     Inventory = new Panel(Vector2(0, 0), PanelComponent(Vector2(r->GetScreenWidth(), r->GetScreenHeight()), 0x0000, false));
 
     InventoryPanels = vector<ItemUIPanel *>();
+
+    InventoryPanelsCleanUp = vector<ItemUIPanel *>();
+    InventoryPanelsOnExit = vector<ItemUIPanel *>();
+
     SetInventoryPanels();
     //Title
     Inventory->AddChild(new Text(Vector2(0, 1), TextComponent(L"ITEMS", 0x0000 | 0x00F0)));
@@ -93,7 +97,7 @@ void SetInventoryPanels()
 {
 
     int w = 9;
-    int h = 4;
+    int h = 1;
     int max = w * h;
 
     for (int j = 0; j < h; j++)
@@ -116,44 +120,67 @@ void SetInventoryPanels()
 void UpdateInventoryPanels()
 {
 
-    int w = 9;
-    int h = 4;
-    int max = w * h;
+    bool update = false;
 
-    for (int j = 0; j < h; j++)
-        for (int i = 0; i < w; i++)
+    //if (InventoryListLog != (int)Player->GetComponent<Character>()->GetInventory().size())
+    //{
+
+    Item *zilch = new Item(0, new cUISpriteComponent());
+
+    if (InventoryPanels.size() != 0)
+    {
+        for (int i = 0; i < InventoryPanels.size(); i++)
         {
-            int index = i * h + j;
+            int index = i;
 
+            InventoryPanels.at(index)->SetItem(zilch);
+            InventoryPanels.at(i)->SetActive(false);
+            InventoryPanels.at(index)->GetSprite().Setinteractive(false);
+        }
+    }
+
+    if (InventoryPanels.size() != 0)
+    {
+        for (int i = 0; i < InventoryPanels.size(); i++)
+        {
             if ((int)Player->GetComponent<Character>()->GetInventory().size() != 0)
             {
-                if (index < (int)Player->GetComponent<Character>()->GetInventory().size())
+                if (i < (int)Player->GetComponent<Character>()->GetInventory().size())
                 {
-                    Item *item = Player->GetComponent<Character>()->GetInventoryAt(index);
-
-                    InventoryPanels.at(index)->SetActive(true);
-
-                    InventoryPanels.at(index)->SetItem(item);
-                    InventoryPanels.at(index)->SetSprite(*item->getUISprite());
-                    InventoryPanels.at(index)->GetSprite().Setinteractive(true);
-                }
-            }
-
-            if (InventoryPanels.at(0)->isActive)
-            {
-                if (InventoryPanels.at(index)->GetComponent<ItemUIComponent>() != nullptr)
-                {
-                    if (InventoryPanels.at(index)->GetComponent<PanelComponent>()->Gettouching())
+                    if (Player->GetComponent<Character>()->GetInventoryAt(i)->GetType() != Item::ITEMTYPE::EMPTY)
                     {
-                        if (Engine->GetCoreEngine()->GetMouse(1).bPressed)
-                        {
-                            //InventoryPanels.erase(remove(InventoryPanels.begin(), InventoryPanels.end(), InventoryPanels.at(0)), InventoryPanels.end());
-                            break;
-                        }
+                        Item *item = Player->GetComponent<Character>()->GetInventoryAt(i);
+
+                        InventoryPanels.at(i)->SetItem(item);
+                        InventoryPanels.at(i)->GetSprite().Setinteractive(true);
+                        InventoryPanels.at(i)->SetActive(true);
                     }
                 }
             }
         }
+    }
+
+    //InventoryListLog = (int)Player->GetComponent<Character>()->GetInventory().size();
+    //Debug(Player->GetComponent<Character>()->GetInventory().at(0)->GetName());
+    //}
+}
+
+void HandleInventoryInteraction()
+{
+    for (int k = 0; k < InventoryPanels.size(); k++)
+    {
+        if (InventoryPanels.at(k)->GetComponent<ItemUIComponent>() != nullptr)
+        {
+            if (InventoryPanels.at(k)->GetComponent<PanelComponent>()->Gettouching())
+            {
+                if (Engine->GetCoreEngine()->GetMouse(1).bPressed)
+                {
+                    Player->GetComponent<Character>()->RemoveFromInventory(InventoryPanels.at(k)->GetItemRef());
+                    InventoryPanels.at(k)->SetActive(false);
+                }
+            }
+        }
+    }
 }
 
 void HandleToolTip()
@@ -225,11 +252,14 @@ bool IsUITouching(Object *o, Panel &toolTip)
         {
             if (o->GetComponent<ItemUIComponent>() != nullptr)
             {
-                //Set Name and color to rarity
-                toolTip.GetChildAt(0)->GetComponent<TextComponent>()->SetText(o->GetComponent<ItemUIComponent>()->GetItem().GetName());
-                toolTip.GetChildAt(0)->GetComponent<TextComponent>()->SetColor(RareToColor((o->GetComponent<ItemUIComponent>()->GetItem().GetRarity())));
+                if (o->GetComponent<ItemUIComponent>()->GetItem().GetType() != Item::ITEMTYPE::EMPTY)
+                {
+                    //Set Name and color to rarity
+                    toolTip.GetChildAt(0)->GetComponent<TextComponent>()->SetText(o->GetComponent<ItemUIComponent>()->GetItem().GetName());
+                    toolTip.GetChildAt(0)->GetComponent<TextComponent>()->SetColor(RareToColor((o->GetComponent<ItemUIComponent>()->GetItem().GetRarity())));
 
-                return true;
+                    return true;
+                }
             }
         }
     }
@@ -282,3 +312,15 @@ bool IsUITouching(Object *o, Panel &toolTip)
 
     return false;
 }
+
+//
+// std::find_if(InventoryPanels.begin(), InventoryPanels.end(), [&](ItemUIPanel *currentPanel) {
+//     if (currentPanel->GetItem() == *item)
+//     {
+//         return true;
+//     }
+//     else
+//     {
+//     }
+//     return false;
+// });

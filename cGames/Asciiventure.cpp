@@ -24,6 +24,7 @@ class ItemUIComponent : public Component
     ItemUIComponent(Item *i) : item(i) {}
 
     Item GetItem() { return *item; }
+    Item* GetItemRef() { return item; }
     void SetItem(Item *i) { this->item = i; };
 };
 
@@ -32,12 +33,13 @@ class ItemUIPanel : public Object
 
   public:
     explicit ItemUIPanel(Vector2 pos, Vector2 s, Item *i = new Item()) : Object(Transform(pos), L"UIPanel", {"UI"}, {
-                                                                                                                        std::make_shared<PanelComponent>(PanelComponent(s, 0x000F | 0x0000, true)),
-                                                                                                                        std::make_shared<cUISpriteComponent>(cUISpriteComponent()),
-                                                                                                                        std::make_shared<ItemUIComponent>(ItemUIComponent(i)),
+            std::make_shared<PanelComponent>(PanelComponent(s, 0x000F | 0x0000, true)),
+            std::make_shared<cUISpriteComponent>(cUISpriteComponent()),
+            std::make_shared<ItemUIComponent>(ItemUIComponent(i)),
                                                                                                                     }){};
 
     cUISpriteComponent &GetSprite() { return *this->GetComponent<cUISpriteComponent>(); }
+    
     void SetSprite(cSprite s)
     {
         this->GetComponent<cUISpriteComponent>()->SetM(s.GetM());
@@ -46,6 +48,8 @@ class ItemUIPanel : public Object
     };
 
     Item GetItem() { return this->GetComponent<ItemUIComponent>()->GetItem(); }
+    Item* GetItemRef() { return this->GetComponent<ItemUIComponent>()->GetItemRef(); }
+
     void SetItem(Item *i)
     {
         this->GetComponent<ItemUIComponent>()->SetItem(i);
@@ -92,6 +96,8 @@ Panel *StatPanel;
 Panel *ToolTip;
 
 std::vector<ItemUIPanel *> InventoryPanels;
+std::vector<ItemUIPanel *> InventoryPanelsCleanUp;
+std::vector<ItemUIPanel *> InventoryPanelsOnExit;
 
 float fPlayerX = 32;
 float fPlayerY = 9;
@@ -114,6 +120,8 @@ enum GameStates
 };
 
 GameStates CurrentState;
+int InventoryListLog = 0;
+
 void Input();
 
 void AssignLevel(Scene *Scene);
@@ -131,6 +139,7 @@ void HandleToolTip();
 bool IsUITouching(Object *o, Panel &toolTip);
 void ManageToolTip();
 WORD RareToColor(Item::ITEMRARITY r);
+void HandleInventoryInteraction();
 
 float OldTime, currentTime, duration = 1.0;
 
@@ -176,6 +185,7 @@ int main()
 
         ManageToolTip();
         UpdateInventoryPanels();
+        HandleInventoryInteraction();
         Engine->EngineUpdate();
         Input();
 

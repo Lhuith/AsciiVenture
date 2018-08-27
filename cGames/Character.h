@@ -59,7 +59,7 @@ class Character : public Component
   int Intellect;
   int Agility;
   int Stamina;
-  int InventoryMax = 10;
+  int InventoryMax = 15;
 
   Object *Selected = nullptr;
 
@@ -69,18 +69,38 @@ class Character : public Component
 
 public:
   std::wstring ClassName;
-  
+
   explicit Character(int _s = 1, int _i = 1, int _a = 1, int _st = 1, std::shared_ptr<Class> _ct = std::make_shared<Class>())
-      : Strength(_s), Intellect(_i), Agility(_a), Stamina(_st), ClassType(&_ct), ClassName(_ct->GetName()), Inventory(){};
+      : Strength(_s), Intellect(_i), Agility(_a), Stamina(_st), ClassType(&_ct), ClassName(_ct->GetName()), Inventory()
+  {   
+    Inventory = std::vector<Item*>(InventoryMax);
+    std::fill(Inventory.begin(), Inventory.end(), new Item());
+  };
 
   Item *GetInventoryAt(int i) { return Inventory[i]; }
 
   std::vector<Item *> GetInventory() { return Inventory; }
-  void AddToInventory(Item &i)
+
+  void PopulateInventory()
   {
-    if (std::find(this->Inventory.begin(), this->Inventory.end(), &i) == this->Inventory.end())
+    for (int i = 0; i < InventoryMax; i++)
     {
-      Inventory.push_back(&i);
+      Inventory.push_back(new Item());
+      //Inventory.at(i) = new Item();
+    }
+  }
+  void AddToInventory(Item &item)
+  {
+    for (int i = 0; i < Inventory.size(); i++)
+    {
+      if (Inventory.at(i)->Type == Item::ITEMTYPE::EMPTY)
+      {
+        if (std::find(this->Inventory.begin(), this->Inventory.end(), &item) == this->Inventory.end())
+        {
+          Inventory.at(i) = &item;
+          break;
+        }
+      }
     }
   }
   //std::vector<Item> GetInventory(){return Inventory;}
@@ -111,6 +131,11 @@ public:
         }
       }
     }
+  }
+
+  void RemoveFromInventory(Item *item)
+  {
+    Inventory.erase(std::remove(Inventory.begin(), Inventory.end(), item), Inventory.end());
   }
 
   int GetHealth() { return Health; }
